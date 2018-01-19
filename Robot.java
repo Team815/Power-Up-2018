@@ -43,10 +43,10 @@ public class Robot extends IterativeRobot {
      */
 	@Override
     public void robotInit() {
-		WPI_TalonSRX talonFrontRight = new WPI_TalonSRX(13);
-		WPI_TalonSRX talonRearRight = new WPI_TalonSRX(12);
-		WPI_TalonSRX talonFrontLeft = new WPI_TalonSRX(14);
-		WPI_TalonSRX talonRearLeft = new WPI_TalonSRX(15);
+		WPI_TalonSRX talonFrontRight = new WPI_TalonSRX(0);
+		WPI_TalonSRX talonRearRight = new WPI_TalonSRX(1);
+		WPI_TalonSRX talonFrontLeft = new WPI_TalonSRX(2);
+		WPI_TalonSRX talonRearLeft = new WPI_TalonSRX(3);
     	
     	talonFrontRight.setInverted(true);
     	talonRearRight.setInverted(true);
@@ -260,7 +260,7 @@ public class Robot extends IterativeRobot {
     	}
     	
     	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
-    	//Drive(horizontal, vertical, rotation, gyroValue);
+    	Drive(horizontal, vertical, rotation, gyroValue);
     }
     
     /**
