@@ -1,21 +1,15 @@
 package org.usfirst.frc.team815.robot;
 
-import java.util.Scanner;
-
 import org.usfirst.frc.team815.robot.Autonomous.State;
 import org.usfirst.frc.team815.robot.BallPickup.BPState;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
 import org.usfirst.frc.team815.robot.Switchboard.PotName;
-
-import com.ctre.CANTalon;
-
-import edu.wpi.first.wpilibj.CameraServer;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -25,7 +19,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	RobotDrive robot;
+	MecanumDrive robot;
 	Controller controller0 = new Controller(0);
 	Controller controller1 = new Controller(1);
 	Controller controllerShoot;
@@ -39,7 +33,7 @@ public class Robot extends IterativeRobot {
 	Lift lift = new Lift(30, 31);
 	Shooter shooter = new Shooter(3, 2);
 	BallPickup ballpickup = new BallPickup(1);
-	CANTalon agitator = new CANTalon(2);
+	WPI_TalonSRX agitator = new WPI_TalonSRX(2);
 	double speedMultiplier = 1;
 	//CameraServer server = CameraServer.getInstance();
 	
@@ -49,15 +43,15 @@ public class Robot extends IterativeRobot {
      */
 	@Override
     public void robotInit() {
-		CANTalon talonFrontRight = new CANTalon(13);
-		CANTalon talonRearRight = new CANTalon(12);
-		CANTalon talonFrontLeft = new CANTalon(14);
-		CANTalon talonRearLeft = new CANTalon(15);
+		WPI_TalonSRX talonFrontRight = new WPI_TalonSRX(13);
+		WPI_TalonSRX talonRearRight = new WPI_TalonSRX(12);
+		WPI_TalonSRX talonFrontLeft = new WPI_TalonSRX(14);
+		WPI_TalonSRX talonRearLeft = new WPI_TalonSRX(15);
     	
     	talonFrontRight.setInverted(true);
     	talonRearRight.setInverted(true);
     	  	
-    	robot = new RobotDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
+    	robot = new MecanumDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
     	
         //server.startAutomaticCapture(0);
     }
@@ -99,7 +93,7 @@ public class Robot extends IterativeRobot {
     	
     	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
     	
-    	robot.mecanumDrive_Cartesian(horizontal, vertical, rotation, gyroValue);
+    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
     	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
@@ -265,7 +259,7 @@ public class Robot extends IterativeRobot {
 	    	}
     	}
     	
-    	robot.mecanumDrive_Cartesian(horizontal, vertical, rotation, gyroValue);
+    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
     	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
@@ -274,7 +268,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void testPeriodic() {
-    	LiveWindow.run();
+    	
     }
     
     @Override
@@ -315,6 +309,6 @@ public class Robot extends IterativeRobot {
     	vertical = Math.min(1, magnitude * Math.cos(angle));
     	vertical *= verticalSign;
 
-    	robot.mecanumDrive_Cartesian(horizontal, vertical, rotation, gyroValue);
+    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
     }
 }

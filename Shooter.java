@@ -1,20 +1,20 @@
 package org.usfirst.frc.team815.robot;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Timer;
 
 public class Shooter {
-	private CANTalon shooter;
-	private CANTalon agitator;
+	private WPI_TalonSRX shooter;
+	private WPI_TalonSRX agitator;
 	private double shooterSpeed = 1;
 	private double agitatorSpeed = 1;
 	private Timer timer = new Timer();
 	
 	
 	public Shooter(int shooterPort, int agitatorPort) {
-		shooter = new CANTalon(shooterPort);
-		agitator = new CANTalon(agitatorPort);
+		shooter = new WPI_TalonSRX(shooterPort);
+		agitator = new WPI_TalonSRX(agitatorPort);
 		
 		shooter.setInverted(true);
 		agitator.setInverted(true);

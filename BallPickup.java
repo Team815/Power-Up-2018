@@ -1,6 +1,6 @@
 package org.usfirst.frc.team815.robot;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class BallPickup {
 	enum BPState {
@@ -19,11 +19,11 @@ public class BallPickup {
 		}
 	}
 	
-	CANTalon ballPickup;
+	WPI_TalonSRX ballPickup;
 	BPState state = BPState.Off;
 	
 	public BallPickup(int motorPort) {
-		ballPickup = new CANTalon(motorPort);
+		ballPickup = new WPI_TalonSRX(motorPort);
 	}
 	
 	public void Toggle(BPState stateIn) {

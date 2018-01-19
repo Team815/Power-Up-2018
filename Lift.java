@@ -1,18 +1,19 @@
 package org.usfirst.frc.team815.robot;
 
-import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.Timer;
 
 public class Lift {
-	private CANTalon lift1;
-	private CANTalon lift2;
+	private WPI_TalonSRX lift1;
+	private WPI_TalonSRX lift2;
 	private Timer timer = new Timer();
 	private final double MAX_SPEED = 1;
 	private final double SPEEDUP_TIME = 3;
 	
 	public Lift(int motorPort1, int motorPort2) {
-		lift1 = new CANTalon(motorPort1);
-		lift2 = new CANTalon(motorPort2);
+		lift1 = new WPI_TalonSRX(motorPort1);
+		lift2 = new WPI_TalonSRX(motorPort2);
 		lift1.setInverted(true);
 		lift2.setInverted(true);
 	}
