@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	MecanumDrive robot;
 	Controller controller0 = new Controller(0);
 	Controller controller1 = new Controller(1);
 	Controller controllerShoot;
@@ -27,6 +26,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerPickup;
 	Controller controllerDrive;
 	Switchboard switchboard = new Switchboard(2);
+	Drive drive = new Drive(0, 1, 2, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
@@ -34,7 +34,6 @@ public class Robot extends IterativeRobot {
 	Shooter shooter = new Shooter(3, 2);
 	BallPickup ballpickup = new BallPickup(1);
 	WPI_TalonSRX agitator = new WPI_TalonSRX(2);
-	double speedMultiplier = 1;
 	//CameraServer server = CameraServer.getInstance();
 	
     /**
@@ -43,16 +42,6 @@ public class Robot extends IterativeRobot {
      */
 	@Override
     public void robotInit() {
-		WPI_TalonSRX talonFrontRight = new WPI_TalonSRX(0);
-		WPI_TalonSRX talonRearRight = new WPI_TalonSRX(1);
-		WPI_TalonSRX talonFrontLeft = new WPI_TalonSRX(2);
-		WPI_TalonSRX talonRearLeft = new WPI_TalonSRX(3);
-    	
-    	talonFrontRight.setInverted(true);
-    	talonRearRight.setInverted(true);
-    	  	
-    	robot = new MecanumDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
-    	
         //server.startAutomaticCapture(0);
     }
     
@@ -93,7 +82,7 @@ public class Robot extends IterativeRobot {
     	
     	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
     	
-    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
+    	drive.Update(horizontal, vertical, rotation, gyroValue);
     	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
@@ -232,7 +221,7 @@ public class Robot extends IterativeRobot {
     	// Speed Control Section
     	
     	if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
-    		SetMaxSpeed();
+    		drive.SetMaxSpeed(controllerDrive);
     	}
     	
     	
@@ -259,8 +248,7 @@ public class Robot extends IterativeRobot {
 	    	}
     	}
     	
-    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
-    	Drive(horizontal, vertical, rotation, gyroValue);
+    	drive.Update(horizontal, vertical, rotation, gyroValue);
     }
     
     /**
@@ -274,41 +262,5 @@ public class Robot extends IterativeRobot {
     @Override
     public void disabledInit() {
     	
-    }
-    
-    private void SetMaxSpeed() {
-    	final double MIN_MULTIPLIER = 0.2;
-    	final double MAX_MULTIPLIER = 1;
-    	final double MULTIPLIER_INCREMENT = 0.01;
-    	if(controllerDrive.IsPressed(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
-    		speedMultiplier -= MULTIPLIER_INCREMENT;
-    	} else if (controllerDrive.IsPressed(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
-    		speedMultiplier += MULTIPLIER_INCREMENT;
-    	}
-    	
-		robot.setMaxOutput(speedMultiplier);
-    }
-    
-    private void Drive(double horizontal, double vertical, double rotation, double gyroValue) {
-    	final double QUARTER = Math.PI / 2;
-		final double MAX_MULTIPLIER = 2;
-		
-		double horizontalSign = Math.signum(horizontal);
-		double verticalSign = Math.signum(vertical);
-		
-    	double magnitude = Math.sqrt(Math.pow(horizontal, 2) + Math.pow(vertical, 2));
-    	double angle = horizontal == 0 ? QUARTER : Math.atan(Math.abs(vertical) / Math.abs(horizontal));
-    	angle = QUARTER - angle;
-    	double percent = angle / QUARTER;
-    	double multiplier = percent * (MAX_MULTIPLIER - 1) + 1;
-    	
-    	magnitude *= multiplier;
-    	
-    	horizontal = Math.min(1, magnitude * Math.sin(angle));
-    	horizontal *= horizontalSign;
-    	vertical = Math.min(1, magnitude * Math.cos(angle));
-    	vertical *= verticalSign;
-
-    	robot.driveCartesian(horizontal, vertical, rotation, gyroValue);
     }
 }
