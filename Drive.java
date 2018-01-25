@@ -1,7 +1,7 @@
 package org.usfirst.frc.team815.robot;
 
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 public class Drive {
@@ -12,10 +12,10 @@ public class Drive {
 	private static final double MULTIPLIER_INCREMENT = 0.01;
 	
 	public Drive(int frontRightId, int rearRightId, int frontLeftId, int rearLeftId) {
-		WPI_TalonSRX talonFrontRight = new WPI_TalonSRX(frontRightId);
-		WPI_TalonSRX talonRearRight = new WPI_TalonSRX(rearRightId);
-		WPI_TalonSRX talonFrontLeft = new WPI_TalonSRX(frontLeftId);
-		WPI_TalonSRX talonRearLeft = new WPI_TalonSRX(rearLeftId);
+		WPI_VictorSPX talonFrontRight = new WPI_VictorSPX(frontRightId);
+		WPI_VictorSPX talonRearRight = new WPI_VictorSPX(rearRightId);
+		WPI_VictorSPX talonFrontLeft = new WPI_VictorSPX(frontLeftId);
+		WPI_VictorSPX talonRearLeft = new WPI_VictorSPX(rearLeftId);
     	
     	talonFrontRight.setInverted(true);
     	talonRearRight.setInverted(true);
