@@ -25,7 +25,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerPickup;
 	Controller controllerDrive;
 	Switchboard switchboard = new Switchboard(2);
-	Drive drive = new Drive(0, 1, 2, 3);
+	Drive drive = new Drive(4, 7, 0, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
