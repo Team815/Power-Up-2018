@@ -96,6 +96,11 @@ public class Autonomous {
 		}
 	}
 	
+	// Get across the auto line
+	public void CrossAutoLine(Drive drive) {
+    	drive.Update(0,1,0,gyro.GetAngle());
+	}
+	
 	public void Done() {
 		horizontal = 0;
 		vertical =  0;
