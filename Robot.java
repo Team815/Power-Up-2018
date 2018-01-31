@@ -49,21 +49,21 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	switchboard.Update();
+//    	switchboard.Update();
     	gyro.SetPlayerAngle();
-    	int autoState = switchboard.GetBinaryValue();
+//    	int autoState = switchboard.GetBinaryValue();
     	
-    	System.out.println(autoState);
+//    	System.out.println(autoState);
     	
-    	if(autoState == 1) {
-    		auto.SetTurningLeft(true);
-    		auto.StartAuto(State.Positioning);
-    	} else if(autoState == 4) {
-    		auto.SetTurningLeft(false);
-    		auto.StartAuto( State.Positioning);
-    	} else if(autoState == 2) {
-    		auto.StartAuto(State.Aligning);
-    	}
+//    	if(autoState == 1) {
+//    		auto.SetTurningLeft(true);
+//    		auto.StartAuto(State.Positioning);
+//    	} else if(autoState == 4) {
+//    		auto.SetTurningLeft(false);
+//    		auto.StartAuto( State.Positioning);
+//    	} else if(autoState == 2) {
+//    		auto.StartAuto(State.Aligning);
+//    	}
     }
 
     /**
@@ -71,13 +71,15 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousPeriodic() {
-    	
-    	auto.Update();
+    	auto.CrossAutoLine(drive);
+    	//auto.Update();
     	
     	double horizontal = auto.GetHorizontal();
     	double vertical = auto.GetVertical();
-    	double rotation = gyro.GetCompensation();
-    	double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
+    	double rotation = 0;
+    	rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
+    	//double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
+    	double gyroValue = 0;
     	
     	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
     	
