@@ -1,6 +1,5 @@
 package org.usfirst.frc.team815.robot;
 
-import org.usfirst.frc.team815.robot.Autonomous.State;
 import org.usfirst.frc.team815.robot.BallPickup.BPState;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
@@ -28,7 +27,7 @@ public class Robot extends IterativeRobot {
 	Drive drive = new Drive(4, 7, 0, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
-	Autonomous auto = new Autonomous(gyro, lightRelay);
+	Autonomous auto = new Autonomous();
 	Lift lift = new Lift(30, 31);
 	Shooter shooter = new Shooter(3, 2);
 	BallPickup ballpickup = new BallPickup(1);
@@ -49,22 +48,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	//switchboard.Update();
-    	gyro.SetPlayerAngle();
-    	/*
-    	int autoState = switchboard.GetBinaryValue();
-    	
-    	System.out.println(autoState);
-    	
-    	if(autoState == 1) {
-    		auto.SetTurningLeft(true);
-    		auto.StartAuto(State.Positioning);
-    	} else if(autoState == 4) {
-    		auto.SetTurningLeft(false);
-    		auto.StartAuto( State.Positioning);
-    	} else if(autoState == 2) {
-    		auto.StartAuto(State.Aligning);
-    	}*/
+    	auto.StartAuto();
     }
 
     /**
@@ -72,20 +56,15 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousPeriodic() {
-    	auto.CrossAutoLine(drive);
-    	//auto.Update();
+    	auto.Update();
     	
     	double horizontal = auto.GetHorizontal();
     	double vertical = auto.GetVertical();
     	double rotation = 0;
     	rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
-    	//double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
     	double gyroValue = 0;
     	
-    	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
-    	
     	drive.Update(horizontal, vertical, rotation, gyroValue);
-    	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
     /**
@@ -209,16 +188,6 @@ public class Robot extends IterativeRobot {
     	}
     	
     	gyro.Update(controllerDrive.GetValue(AnalogName.RightJoyX) != 0);
-    	
-    	// Auto Align Section
-    	
-    	if(controllerDrive.WasClicked(ButtonName.X)) {
-    		if(controllerDrive.IsToggled(ButtonName.X)) {
-    			auto.StartAuto(State.Aligning);
-    		} else {
-    			lightRelay.set(Relay.Value.kOff);
-    		}
-    	}
     	
     	// Speed Control Section
     	

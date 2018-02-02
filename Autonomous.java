@@ -1,115 +1,35 @@
 package org.usfirst.frc.team815.robot;
 
-import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Autonomous {
 	
-	public enum State {
-		Positioning,
-		Aligning,
-		Inserting,
-		Done;
-	}
-	
-	Gyro gyro;
-	Camera camera = new Camera();
-	Relay lightRelay;
-	private double horizontal = 0;
-	private double vertical = 0;
-	private double startingAngle = 0;
-	private boolean turningLeft;
 	private Timer timer = new Timer();
-	private State state = State.Positioning;
+	//private Timer boostTimer = new Timer();
+	private double horizontal, vertical;
 	
-	public Autonomous(Gyro gyroIn, Relay lightRelayIn) {
-		gyro = gyroIn;
-		lightRelay = lightRelayIn;
+	public Autonomous() {
 	}
-	public void StartAuto(State startingState) {
-		state = startingState;
-		startingAngle = gyro.GetAngle();
-		if(startingState == State.Aligning) {
-			camera.StartCamera();
-    		lightRelay.set(Relay.Value.kOn);
-		}
-		timer.reset();
+	
+	public void StartAuto() {
+		horizontal = 0;
+		vertical = 0;
 		timer.start();
+		//boostTimer.start();
 	}
 	
 	public void Update() {
-		if(state == State.Positioning) {
-			GetIntoPosition();
-		} else if(state == State.Aligning) {
-			Align(camera.ReadBuffer());
-		} else if(state == State.Inserting) {
-			Insert();
-		} else if(state == State.Done) {
-			Done();
-		}
-		gyro.Update(false);
-	}
-	
-	public void GetIntoPosition() {
-		final double POSITION_SPEED = 1;
-		final double TIMER_LIMIT = 0.6;
-		double angle = turningLeft ? 60 : -60;
-		if(timer.get() > TIMER_LIMIT) {
-			timer.stop();
-			state = State.Aligning;
-			camera.StartCamera();
-			lightRelay.set(Relay.Value.kOn);
-		} else {
-			vertical = POSITION_SPEED;
-			horizontal = -Math.signum(angle) * POSITION_SPEED / 2;
-			gyro.SetTargetAngle(startingAngle + timer.get() * -angle / TIMER_LIMIT);
-		}
-	}
-	
-	public void Align(int angle) {
-		final double ALIGN_SPEED = 0.3;
-		if(angle == -3) {
-			horizontal = 0;
-    		vertical = 0;
-			state = State.Inserting;
-			lightRelay.set(Relay.Value.kOff);
-			timer.reset();
-			timer.start();
-		}
-		if(angle == -2) {
-    		horizontal = 0;
-    		vertical = 0;
-    	} else if (angle >= 0) {
-    		horizontal = -ALIGN_SPEED * Math.cos(angle * 2 * Math.PI / 360);
-    		vertical = ALIGN_SPEED * Math.sin(angle * 2 * Math.PI / 360);
-    	}
-	}
-	
-	public void Insert() {
-		final double INSERT_SPEED = .5;
-		final double INSERT_TIME = .5;
-		horizontal = 0;
-		vertical =  INSERT_SPEED;
-		if(timer.get() >= INSERT_TIME) {
-			timer.stop();
-			state = State.Done;
-		}
+		CrossAutoLine();
 	}
 	
 	// Get across the auto line
-	public void CrossAutoLine(Drive drive) {
-		horizontal = 0;
-		vertical = .2;
-//    	drive.Update(0,1,0,gyro.GetAngle());
-	}
-	
-	public void Done() {
-		horizontal = 0;
-		vertical =  0;
-	}
-	
-	public State GetState() {
-		return state;
+	private void CrossAutoLine() {
+		if(timer.get() >= 5) {
+			vertical = 0;
+		} else {
+			// Accelerate to target speed
+			vertical = 0.2 * Math.min(1, timer.get());
+		}
 	}
 	
 	public double GetHorizontal() {
@@ -118,9 +38,5 @@ public class Autonomous {
 	
 	public double GetVertical() {
 		return vertical;
-	}
-	
-	public void SetTurningLeft(boolean turningLeftIn) {
-		turningLeft = turningLeftIn;
 	}
 }
