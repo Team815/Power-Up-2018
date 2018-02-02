@@ -16,9 +16,6 @@ public class Drive {
 		WPI_VictorSPX talonRearRight = new WPI_VictorSPX(rearRightId);
 		WPI_VictorSPX talonFrontLeft = new WPI_VictorSPX(frontLeftId);
 		WPI_VictorSPX talonRearLeft = new WPI_VictorSPX(rearLeftId);
-    	
-    	talonFrontRight.setInverted(true);
-    	talonRearRight.setInverted(true);
     	  	
     	drive = new MecanumDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
 	}
@@ -34,6 +31,7 @@ public class Drive {
     }
 	
 	public void Update(double horizontal, double vertical, double rotation, double gyroValue) {
+		/*
 		final double QUARTER = Math.PI / 2;
 		final double MAX_MULTIPLIER = 2;
 		
@@ -41,8 +39,7 @@ public class Drive {
 		double verticalSign = Math.signum(vertical);
 		
     	double magnitude = Math.sqrt(Math.pow(horizontal, 2) + Math.pow(vertical, 2));
-    	double angle = horizontal == 0 ? QUARTER : Math.atan(Math.abs(vertical) / Math.abs(horizontal));
-    	angle = QUARTER - angle;
+    	double angle = vertical == 0 ? 0 : Math.atan(Math.abs(horizontal) / Math.abs(vertical));
     	double percent = angle / QUARTER;
     	double multiplier = percent * (MAX_MULTIPLIER - 1) + 1;
     	
@@ -52,7 +49,7 @@ public class Drive {
     	horizontal *= horizontalSign;
     	vertical = Math.min(1, magnitude * Math.cos(angle));
     	vertical *= verticalSign;
-
+    	*/
     	drive.driveCartesian(horizontal, vertical, rotation, gyroValue);
 	}
 }
