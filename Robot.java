@@ -19,12 +19,12 @@ import edu.wpi.first.wpilibj.Relay;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
-	Controller controller1 = new Controller(1);
+	//Controller controller1 = new Controller(1);
 	Controller controllerShoot;
 	Controller controllerLift;
 	Controller controllerPickup;
 	Controller controllerDrive;
-	Switchboard switchboard = new Switchboard(2);
+	//Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 0, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
@@ -49,8 +49,9 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	switchboard.Update();
+    	//switchboard.Update();
     	gyro.SetPlayerAngle();
+    	/*
     	int autoState = switchboard.GetBinaryValue();
     	
     	System.out.println(autoState);
@@ -63,7 +64,7 @@ public class Robot extends IterativeRobot {
     		auto.StartAuto( State.Positioning);
     	} else if(autoState == 2) {
     		auto.StartAuto(State.Aligning);
-    	}
+    	}*/
     }
 
     /**
@@ -102,8 +103,8 @@ public class Robot extends IterativeRobot {
     		controllerShoot = controller0;
         	controllerLift = controller0;
     	} else {
-    		controllerShoot = controller1;
-        	controllerLift = controller1;
+    		controllerShoot = controller0;
+        	controllerLift = controller0;
     	}
     	
     }
@@ -115,16 +116,16 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
     	
     	controller0.Update();
-    	controller1.Update();
-    	switchboard.Update();
+    	//controller1.Update();
+    	//switchboard.Update();
     	
     	if(controller0.WasClicked(ButtonName.Start)) {
     		if(controller0.IsToggled(ButtonName.Start)) {
         		controllerShoot = controller0;
             	controllerLift = controller0;
         	} else {
-        		controllerShoot = controller1;
-            	controllerLift = controller1;
+        		controllerShoot = controller0;
+            	controllerLift = controller0;
         	}
     	}
     	
@@ -158,7 +159,7 @@ public class Robot extends IterativeRobot {
     	
     	// Shooter Section
     	
-    	shooter.SetSpeeds(switchboard.GetAnalog(PotName.TopPot), switchboard.GetAnalog(PotName.BottomPot));
+    	//shooter.SetSpeeds(switchboard.GetAnalog(PotName.TopPot), switchboard.GetAnalog(PotName.BottomPot));
     	
     	if(controllerShoot.IsPressed(ButtonName.A)) {
     		shooter.SimpleUpdateShooter();
@@ -239,7 +240,7 @@ public class Robot extends IterativeRobot {
 	    		rotation = gyro.GetCompensation();
 	    		gyroValue = 0;
 	    	} else {
-	    		horizontal = -controllerDrive.GetValue(AnalogName.LeftJoyX);
+	    		horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);
 	    		vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
 	    		rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
 	    		rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
