@@ -19,8 +19,12 @@ public class Analog {
 		return value;
 	}
 	
+	public boolean JustActivated() {
+		return value != 0 && previousValue == 0;
+	}
+	
 	public boolean JustZeroed() {
-		return value == 0 && !(previousValue == 0);
+		return value == 0 && previousValue != 0;
 	}
 	
 	public void Update(Joystick stick, double analogThreshold) {

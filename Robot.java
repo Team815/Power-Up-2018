@@ -1,7 +1,6 @@
 package org.usfirst.frc.team815.robot;
 
 import org.usfirst.frc.team815.robot.Autonomous.State;
-import org.usfirst.frc.team815.robot.BallPickup.BPState;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
@@ -20,19 +19,14 @@ import edu.wpi.first.wpilibj.Relay;
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
 	//Controller controller1 = new Controller(1);
-	Controller controllerShoot;
-	Controller controllerLift;
-	Controller controllerPickup;
+	Controller controllerElevator;
 	Controller controllerDrive;
 	//Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 0, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
-	Lift lift = new Lift(30, 31);
-	Shooter shooter = new Shooter(3, 2);
-	BallPickup ballpickup = new BallPickup(1);
-	WPI_TalonSRX agitator = new WPI_TalonSRX(2);
+	Elevator elevator = new Elevator(5,6);
 	//CameraServer server = CameraServer.getInstance();
 	
     /**
@@ -97,15 +91,15 @@ public class Robot extends IterativeRobot {
     	//agitator.set(1);
     	
     	controllerDrive = controller0;
-    	controllerPickup =  controller0;
+    	controllerElevator = controller0;
     	
-    	if(controller0.IsToggled(ButtonName.Start)) {
-    		controllerShoot = controller0;
-        	controllerLift = controller0;
-    	} else {
-    		controllerShoot = controller0;
-        	controllerLift = controller0;
-    	}
+//    	if(controller0.IsToggled(ButtonName.Start)) {
+//    		controllerShoot = controller0;
+//        	controllerEvelvator = controller0;
+//    	} else {
+//    		controllerShoot = controller0;
+//        	controllerEvelvator = controller0;
+//    	}
     	
     }
 
@@ -121,74 +115,34 @@ public class Robot extends IterativeRobot {
     	
     	if(controller0.WasClicked(ButtonName.Start)) {
     		if(controller0.IsToggled(ButtonName.Start)) {
-        		controllerShoot = controller0;
-            	controllerLift = controller0;
+            	controllerElevator = controller0;
         	} else {
-        		controllerShoot = controller0;
-            	controllerLift = controller0;
+            	controllerElevator = controller0;
         	}
     	}
     	
-    	// Ball Pickup Section
+    	// Elevator Section
     	
-    	if(controllerPickup.WasDpadDirectionClicked(Direction.Up)) {
-    		ballpickup.Toggle(BPState.Suck);
-    	} else if(controllerPickup.WasDpadDirectionClicked(Direction.Down)) {
-    		ballpickup.Toggle(BPState.Blow);
-    	} else if(controllerPickup.WasDpadDirectionClicked(Direction.Right)) {
-    		ballpickup.Toggle(BPState.Off);
+    	/*
+    	if(controllerEvelvator.JustActivated(AnalogName.RightTrigger) || controllerEvelvator.JustActivated(AnalogName.LeftTrigger)) {
+    		elevator.StartElevator();
     	}
-    	
-    	// Lift Section
-    	
-    	if(controllerLift.WasClicked(ButtonName.Y)) {
-    		lift.StartClimb();
+	
+    	if(controllerEvelvator.JustZeroed(AnalogName.RightTrigger) || controllerEvelvator.JustZeroed(AnalogName.LeftTrigger)) {
+    		elevator.StopElevator();
     	}
+		*/
     	
-    	if(controllerLift.WasReleased(ButtonName.Y)) {
-    		lift.StopClimb();
-    	}
-    	
-    	if(controllerLift.IsPressed(ButtonName.Y)) {
-    		lift.Climb();
-    	}
-    	
-    	if(controllerLift.GetValue(AnalogName.RightTrigger) != 0 || controllerLift.JustZeroed(AnalogName.RightTrigger)){
-    		lift.SetSpeed(controllerLift.GetValue(AnalogName.RightTrigger));
-    	}
-    	
-    	// Shooter Section
-    	
-    	//shooter.SetSpeeds(switchboard.GetAnalog(PotName.TopPot), switchboard.GetAnalog(PotName.BottomPot));
-    	
-    	if(controllerShoot.IsPressed(ButtonName.A)) {
-    		shooter.SimpleUpdateShooter();
-    	}
-    	
-    	if(controllerShoot.WasReleased(ButtonName.A)) {
-    		shooter.SimpleStopShooter();
-    	}
-    	
-    	if(controllerShoot.IsPressed(ButtonName.LB)) {
-    		shooter.SimpleUpdateAgitator();
-    	}
-    	
-    	if(controllerShoot.WasReleased(ButtonName.LB)) {
-    		shooter.SimpleStopAgitator();
-    	}
-    	
-    	if(controllerShoot.WasClicked(ButtonName.B)) {
-    		shooter.startShooter();
-    	}
-    	
-    	if(controllerShoot.IsPressed(ButtonName.B)) {
-    		shooter.UpdateShooter();
-    	}
-    	
-    	if(controllerShoot.WasReleased(ButtonName.B)) {
-    		shooter.stopShooter();
-    	}
-    	
+		if(controllerElevator.GetValue(AnalogName.RightTrigger) > 0) {
+			elevator.SetState(Elevator.State.RAISING);
+		} else if(controllerElevator.GetValue(AnalogName.LeftTrigger) > 0) {
+			elevator.SetState(Elevator.State.LOWERING);
+		} else {
+			elevator.SetState(Elevator.State.STOPPED);
+		}
+		
+		elevator.Update();
+		
     	// Gyro Section
     	
     	if(controllerDrive.WasClicked(ButtonName.B)) {
