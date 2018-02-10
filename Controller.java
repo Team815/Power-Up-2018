@@ -102,6 +102,10 @@ public class Controller {
 		return analogs.get(analog.GetIndex()).GetValue();
 	}
 	
+	public boolean JustActivated(AnalogName analog) {
+		return analogs.get(analog.GetIndex()).JustActivated();
+	}
+	
 	public boolean JustZeroed(AnalogName analog) {
 		return analogs.get(analog.GetIndex()).JustZeroed();
 	}
