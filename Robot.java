@@ -4,6 +4,7 @@ import org.usfirst.frc.team815.robot.Autonomous.State;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
+import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Switchboard.PotName;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -123,22 +124,20 @@ public class Robot extends IterativeRobot {
     	
     	// Elevator Section
     	
-    	/*
-    	if(controllerEvelvator.JustActivated(AnalogName.RightTrigger) || controllerEvelvator.JustActivated(AnalogName.LeftTrigger)) {
-    		elevator.StartElevator();
-    	}
-	
-    	if(controllerEvelvator.JustZeroed(AnalogName.RightTrigger) || controllerEvelvator.JustZeroed(AnalogName.LeftTrigger)) {
-    		elevator.StopElevator();
-    	}
-		*/
-    	
 		if(controllerElevator.GetValue(AnalogName.RightTrigger) > 0) {
 			elevator.SetState(Elevator.State.RAISING);
 		} else if(controllerElevator.GetValue(AnalogName.LeftTrigger) > 0) {
 			elevator.SetState(Elevator.State.LOWERING);
 		} else {
 			elevator.SetState(Elevator.State.STOPPED);
+		}
+		
+		if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
+			elevator.SetPresetTarget(PresetTarget.SCALE);
+		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
+			elevator.SetPresetTarget(PresetTarget.SWITCH);
+		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
+			elevator.SetPresetTarget(PresetTarget.BOTTOM);
 		}
 		
 		elevator.Update();
