@@ -22,11 +22,11 @@ public class Tilt {
 	public Tilt(int motorPort) {
 		tiltMotor = new  WPI_VictorSPX(motorPort);
 		leftEncoder = new Encoder(4, 5);
-		rightEncoder = new Encoder(2,3);
+		rightEncoder = new Encoder(2, 3);
 		state = State.DOWN;
 	}
 	
-	public void startTilting() {
+	public void StartTilting() {
 		switch(state) {
 		case UP:
 		case MOVING_UP:
@@ -44,22 +44,21 @@ public class Tilt {
 	public void Update() {
 		double minValue = Math.min(leftEncoder.get(), rightEncoder.get());
 		double maxValue = Math.max(leftEncoder.get(), rightEncoder.get());
-		System.out.println(state.toString() + " " + minValue + " " + maxValue);
 		switch(state) {
 		case MOVING_UP:
 			if(minValue < NO_TILT_ROTATION_VALUE)
-				stopTilting();
+				StopTilting();
 			break;
 		case MOVING_DOWN:
 			if(maxValue > MAX_INWARD_TILT_ROTATION_VALUE)
-				stopTilting();
+				StopTilting();
 			break;
 		default:
 			break;
 		}
 	}
 	
-	public void stopTilting() {		
+	public void StopTilting() {		
 		tiltMotor.set(0);
 		switch(state) {
 		case UP:
