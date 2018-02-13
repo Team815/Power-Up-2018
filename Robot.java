@@ -21,6 +21,7 @@ public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
 	//Controller controller1 = new Controller(1);
 	Controller controllerElevator;
+	Controller controllerTilt;
 	Controller controllerDrive;
 	//Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 0, 3);
@@ -28,6 +29,7 @@ public class Robot extends IterativeRobot {
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
 	Elevator elevator = new Elevator(5,6);
+	Tilt tilt = new Tilt(2);
 	//CameraServer server = CameraServer.getInstance();
 	
     /**
@@ -93,6 +95,7 @@ public class Robot extends IterativeRobot {
     	
     	controllerDrive = controller0;
     	controllerElevator = controller0;
+    	controllerTilt = controller0;
     	
 //    	if(controller0.IsToggled(ButtonName.Start)) {
 //    		controllerShoot = controller0;
@@ -121,6 +124,14 @@ public class Robot extends IterativeRobot {
             	controllerElevator = controller0;
         	}
     	}
+    	
+    	// Tilt Section
+    	
+    	if(controllerTilt.WasClicked(ButtonName.Start)) {
+			tilt.StartTilting();
+		}
+    	
+    	tilt.Update();
     	
     	// Elevator Section
     	
