@@ -129,7 +129,7 @@ public class Robot extends IterativeRobot {
 //    	if(tilt.isTilting()) {
 //    		tilt.stopTilting();
 //    	}
-    	if(controllerTilt.WasClicked(ButtonName.Select)) {
+    	if(controllerTilt.WasClicked(ButtonName.Start)) {
 			tilt.startTilting();
 		}
     	
