@@ -176,16 +176,6 @@ public class Robot extends IterativeRobot {
     	
     	gyro.Update(controllerDrive.GetValue(AnalogName.RightJoyX) != 0);
     	
-    	// Auto Align Section
-    	
-    	if(controllerDrive.WasClicked(ButtonName.X)) {
-    		if(controllerDrive.IsToggled(ButtonName.X)) {
-    			auto.StartAuto(State.Aligning);
-    		} else {
-    			lightRelay.set(Relay.Value.kOff);
-    		}
-    	}
-    	
     	// Speed Control Section
     	
     	if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
