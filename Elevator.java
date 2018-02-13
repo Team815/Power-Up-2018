@@ -3,21 +3,19 @@ package org.usfirst.frc.team815.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Timer;
 
 public class Elevator {
 	
-	public enum State {
+	public enum AutoState {
 		STOPPED,
 		RAISING,
-		LOWERING,
-		AUTO
+		LOWERING
 	}
 	
 	public enum PresetTarget {
 		NONE(-1),
-		SCALE(1000),
-		SWITCH(500),
+		SCALE(3400),
+		SWITCH(700),
 		BOTTOM(0);
 		
 		int encoderTarget;
@@ -33,11 +31,11 @@ public class Elevator {
 	
 	public class Autovator {
 		public PresetTarget target = PresetTarget.NONE;
-		public State initialState = State.STOPPED;
+		public AutoState autoState = AutoState.STOPPED;
 		
 		
 		public boolean PassedTarget() {
-			switch(initialState)
+			switch(autoState)
 			{
 			case RAISING:
 				return target.getEncoderTarget() < encoder.get();
@@ -52,63 +50,55 @@ public class Elevator {
 	private WPI_VictorSPX elevatorMotor1;
 	private WPI_VictorSPX elevatorMotor2;
 	private Encoder encoder;
-	private Timer timer;
 	private final double MAX_SPEED = 1;
-	private final double SPEEDUP_TIME = 3;
-	private State state = State.STOPPED;
 	private Autovator autovator = new Autovator();
+	private double speed;
  	
 	public Elevator(int motorPort1, int motorPort2) {
+		speed = 0;
 		elevatorMotor1 = new  WPI_VictorSPX(motorPort1);
 		elevatorMotor2 = new WPI_VictorSPX(motorPort2);
 		encoder = new Encoder(0, 1);
 	
 	}
 	
-	public void SetElevatorMotor(double speed) {
+	public void SetElevatorMotor() {
 		elevatorMotor1.set(speed);
 		elevatorMotor2.set(speed);
 	}
 	
-	public void SetState(State stateIn) {
-		if(stateIn != State.STOPPED || state != State.AUTO) {
-			state = stateIn;
-		}
+	public void SetSpeed(double speedIn) {
+		speed = speedIn;
 	}
 	
+	public void StopAuto() {
+		autovator.autoState = AutoState.STOPPED;
+		autovator.target = PresetTarget.NONE;
+	}
 	public void SetPresetTarget(PresetTarget targetIn) {
-		state = State.AUTO;
 		autovator.target = targetIn;
 		if (targetIn.getEncoderTarget() > encoder.get()) {
-			autovator.initialState = State.RAISING;
+			autovator.autoState = AutoState.RAISING;
 		} else if  (targetIn.getEncoderTarget() < encoder.get()) {
-			autovator.initialState = State.LOWERING;
+			autovator.autoState = AutoState.LOWERING;
 		} else {
-			autovator.initialState = State.STOPPED;
+			StopAuto();
 		}
 	}
 	
 	public void Update() {
-		double speed = 0;
-		System.out.println(state.toString());
-		switch(state) {
-		case STOPPED:
-			speed = 0;
-			break;
+		switch(autovator.autoState) {
 		case RAISING:
-			speed = MAX_SPEED;
-			break;
 		case LOWERING:
-			speed = -MAX_SPEED;
-			break;
-		case AUTO:
 			if(autovator.PassedTarget()) {
-				state = State.STOPPED;
+				StopAuto();
 			} else {
-				speed = Math.signum(autovator.target.getEncoderTarget() - encoder.get()) * MAX_SPEED;
+				speed = MAX_SPEED * Math.signum(autovator.target.encoderTarget - encoder.get());
 			}
+			break;
+		case STOPPED:
+			break;
 		}
-		
-		SetElevatorMotor(speed); 
+		SetElevatorMotor(); 
 	}
 }
