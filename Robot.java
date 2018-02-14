@@ -46,22 +46,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	//switchboard.Update();
     	gyro.SetPlayerAngle();
-    	/*
-    	int autoState = switchboard.GetBinaryValue();
-    	
-    	System.out.println(autoState);
-    	
-    	if(autoState == 1) {
-    		auto.SetTurningLeft(true);
-    		auto.StartAuto(State.Positioning);
-    	} else if(autoState == 4) {
-    		auto.SetTurningLeft(false);
-    		auto.StartAuto( State.Positioning);
-    	} else if(autoState == 2) {
-    		auto.StartAuto(State.Aligning);
-    	}*/
     }
 
     /**
@@ -77,10 +62,7 @@ public class Robot extends IterativeRobot {
     	double rotation = gyro.GetCompensation();
     	double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
     	
-    	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
-    	
     	drive.Update(horizontal, vertical, rotation, gyroValue);
-    	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
     /**
@@ -91,20 +73,10 @@ public class Robot extends IterativeRobot {
     	
     	gyro.ResetTargetAngle();
     	lightRelay.set(Relay.Value.kOff);
-    	//agitator.set(1);
     	
     	controllerDrive = controller0;
     	controllerElevator = controller0;
     	controllerTilt = controller0;
-    	
-//    	if(controller0.IsToggled(ButtonName.Start)) {
-//    		controllerShoot = controller0;
-//        	controllerEvelvator = controller0;
-//    	} else {
-//    		controllerShoot = controller0;
-//        	controllerEvelvator = controller0;
-//    	}
-    	
     }
 
     /**
@@ -138,7 +110,9 @@ public class Robot extends IterativeRobot {
     	double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
     	double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
     	double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
-    	triggerValue *= triggerValue == leftTriggerValue ? -1 : 1;
+    	if(triggerValue == leftTriggerValue) {
+    		triggerValue *= -1;
+    	}
     	if(triggerValue != 0) {
     		elevator.StopAuto();
     		elevator.SetSpeed(triggerValue);
@@ -149,6 +123,8 @@ public class Robot extends IterativeRobot {
     			elevator.SetPresetTarget(PresetTarget.SWITCH);
     		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
     			elevator.SetPresetTarget(PresetTarget.BOTTOM);
+    		} else {
+    			elevator.SetSpeed(0);
     		}
     	}
 		elevator.Update();

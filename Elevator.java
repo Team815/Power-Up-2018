@@ -6,17 +6,30 @@ import edu.wpi.first.wpilibj.Encoder;
 
 public class Elevator {
 	
-	public enum AutoState {
+	private WPI_VictorSPX elevatorMotor1;
+	private WPI_VictorSPX elevatorMotor2;
+	private Encoder encoder;
+	private double speed;
+	private PresetTarget presetTarget = PresetTarget.NONE;
+	private AutoState autoState = AutoState.STOPPED;
+	
+	private static final double MAX_SPEED = 1;
+	private static final int ENCODER_VALUE_NONE = -1;
+	private static final int ENCODER_VALUE_SCALE = 3400;
+	private static final int ENCODER_VALUE_SWITCH = 700;
+	private static final int ENCODER_VALUE_BOTTOM = 0;
+	
+	public static enum AutoState {
 		STOPPED,
 		RAISING,
 		LOWERING
 	}
 	
-	public enum PresetTarget {
-		NONE(-1),
-		SCALE(3400),
-		SWITCH(700),
-		BOTTOM(0);
+	public static enum PresetTarget {
+		NONE(ENCODER_VALUE_NONE),
+		SCALE(ENCODER_VALUE_SCALE),
+		SWITCH(ENCODER_VALUE_SWITCH),
+		BOTTOM(ENCODER_VALUE_BOTTOM);
 		
 		int encoderTarget;
 		
@@ -28,31 +41,6 @@ public class Elevator {
 			return encoderTarget;
 		}
 	}
-	
-	public class Autovator {
-		public PresetTarget target = PresetTarget.NONE;
-		public AutoState autoState = AutoState.STOPPED;
-		
-		
-		public boolean PassedTarget() {
-			switch(autoState)
-			{
-			case RAISING:
-				return target.getEncoderTarget() < encoder.get();
-			case LOWERING:
-				return target.getEncoderTarget() > encoder.get();
-			default:
-				return true;
-			}
-		}
-	}
-	
-	private WPI_VictorSPX elevatorMotor1;
-	private WPI_VictorSPX elevatorMotor2;
-	private Encoder encoder;
-	private final double MAX_SPEED = 1;
-	private Autovator autovator = new Autovator();
-	private double speed;
  	
 	public Elevator(int motorPort1, int motorPort2) {
 		speed = 0;
@@ -72,28 +60,40 @@ public class Elevator {
 	}
 	
 	public void StopAuto() {
-		autovator.autoState = AutoState.STOPPED;
-		autovator.target = PresetTarget.NONE;
+		autoState = AutoState.STOPPED;
+		presetTarget = PresetTarget.NONE;
 	}
-	public void SetPresetTarget(PresetTarget targetIn) {
-		autovator.target = targetIn;
-		if (targetIn.getEncoderTarget() > encoder.get()) {
-			autovator.autoState = AutoState.RAISING;
-		} else if  (targetIn.getEncoderTarget() < encoder.get()) {
-			autovator.autoState = AutoState.LOWERING;
+	public void SetPresetTarget(PresetTarget presetTargetIn) {
+		presetTarget = presetTargetIn;
+		if (presetTargetIn.getEncoderTarget() > encoder.get()) {
+			autoState = AutoState.RAISING;
+		} else if  (presetTargetIn.getEncoderTarget() < encoder.get()) {
+			autoState = AutoState.LOWERING;
 		} else {
 			StopAuto();
 		}
 	}
 	
+	public boolean PassedTarget() {
+		switch(autoState)
+		{
+		case RAISING:
+			return presetTarget.getEncoderTarget() < encoder.get();
+		case LOWERING:
+			return presetTarget.getEncoderTarget() > encoder.get();
+		default:
+			return true;
+		}
+	}
+	
 	public void Update() {
-		switch(autovator.autoState) {
+		switch(autoState) {
 		case RAISING:
 		case LOWERING:
-			if(autovator.PassedTarget()) {
+			if(PassedTarget()) {
 				StopAuto();
 			} else {
-				speed = MAX_SPEED * Math.signum(autovator.target.encoderTarget - encoder.get());
+				speed = MAX_SPEED * Math.signum(presetTarget.encoderTarget - encoder.get());
 			}
 			break;
 		case STOPPED:
