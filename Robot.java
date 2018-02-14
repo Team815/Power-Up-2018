@@ -4,6 +4,7 @@ import org.usfirst.frc.team815.robot.Autonomous.State;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
+import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Switchboard.PotName;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -45,22 +46,7 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	//switchboard.Update();
     	gyro.SetPlayerAngle();
-    	/*
-    	int autoState = switchboard.GetBinaryValue();
-    	
-    	System.out.println(autoState);
-    	
-    	if(autoState == 1) {
-    		auto.SetTurningLeft(true);
-    		auto.StartAuto(State.Positioning);
-    	} else if(autoState == 4) {
-    		auto.SetTurningLeft(false);
-    		auto.StartAuto( State.Positioning);
-    	} else if(autoState == 2) {
-    		auto.StartAuto(State.Aligning);
-    	}*/
     }
 
     /**
@@ -76,10 +62,7 @@ public class Robot extends IterativeRobot {
     	double rotation = gyro.GetCompensation();
     	double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
     	
-    	//System.out.println("Target Angle:" + gyro.GetTargetAngle() + ", Angle: " + gyro.GetAngle() + ", Compensation: " + gyro.GetCompensation());
-    	
     	drive.Update(horizontal, vertical, rotation, gyroValue);
-    	//Drive(horizontal, vertical, rotation, gyroValue);
     }
     
     /**
@@ -90,20 +73,10 @@ public class Robot extends IterativeRobot {
     	
     	gyro.ResetTargetAngle();
     	lightRelay.set(Relay.Value.kOff);
-    	//agitator.set(1);
     	
     	controllerDrive = controller0;
     	controllerElevator = controller0;
     	controllerTilt = controller0;
-    	
-//    	if(controller0.IsToggled(ButtonName.Start)) {
-//    		controllerShoot = controller0;
-//        	controllerEvelvator = controller0;
-//    	} else {
-//    		controllerShoot = controller0;
-//        	controllerEvelvator = controller0;
-//    	}
-    	
     }
 
     /**
@@ -134,24 +107,26 @@ public class Robot extends IterativeRobot {
     	
     	// Elevator Section
     	
-    	/*
-    	if(controllerEvelvator.JustActivated(AnalogName.RightTrigger) || controllerEvelvator.JustActivated(AnalogName.LeftTrigger)) {
-    		elevator.StartElevator();
+    	double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
+    	double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
+    	double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
+    	if(triggerValue == leftTriggerValue) {
+    		triggerValue *= -1;
     	}
-	
-    	if(controllerEvelvator.JustZeroed(AnalogName.RightTrigger) || controllerEvelvator.JustZeroed(AnalogName.LeftTrigger)) {
-    		elevator.StopElevator();
+    	if(triggerValue != 0) {
+    		elevator.StopAuto();
+    		elevator.SetSpeed(triggerValue);
+    	} else {
+    		if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
+    			elevator.SetPresetTarget(PresetTarget.SCALE);
+    		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
+    			elevator.SetPresetTarget(PresetTarget.SWITCH);
+    		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
+    			elevator.SetPresetTarget(PresetTarget.BOTTOM);
+    		} else {
+    			elevator.SetSpeed(0);
+    		}
     	}
-		*/
-    	
-		if(controllerElevator.GetValue(AnalogName.RightTrigger) > 0) {
-			elevator.SetState(Elevator.State.RAISING);
-		} else if(controllerElevator.GetValue(AnalogName.LeftTrigger) > 0) {
-			elevator.SetState(Elevator.State.LOWERING);
-		} else {
-			elevator.SetState(Elevator.State.STOPPED);
-		}
-		
 		elevator.Update();
 		
     	// Gyro Section
