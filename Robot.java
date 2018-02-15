@@ -107,29 +107,36 @@ public class Robot extends IterativeRobot {
     	
     	// Elevator Section
     	
-    	/*
+    	boolean leftTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.LeftTrigger);
+    	boolean rightTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.RightTrigger);
+    	boolean leftTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.LeftTrigger);
+    	boolean rightTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.RightTrigger);
     	double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
     	double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
     	double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
+    	
+    	if(leftTriggerActivated || rightTriggerActivated) {
+    		elevator.DisablePID();
+    	} else if (leftTriggerZeroed || rightTriggerZeroed) {
+    		if(triggerValue == 0) {
+    			elevator.EnablePID();
+    		}
+    	}
+    	
     	if(triggerValue == leftTriggerValue) {
     		triggerValue *= -1;
     	}
     	if(triggerValue != 0) {
-    		elevator.StopAuto();
     		elevator.SetSpeed(triggerValue);
-    	} else {*/
+    	} else {
     		if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
     			elevator.SetPresetTarget(PresetTarget.SCALE);
     		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
     			elevator.SetPresetTarget(PresetTarget.SWITCH);
     		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
     			elevator.SetPresetTarget(PresetTarget.BOTTOM);
-    		}/* else {
-    			elevator.SetSpeed(0);
     		}
     	}
-		elevator.Update();
-		*/
     		
     	// Gyro Section
     	
