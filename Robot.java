@@ -107,6 +107,7 @@ public class Robot extends IterativeRobot {
     	
     	// Elevator Section
     	
+    	/*
     	double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
     	double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
     	double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
@@ -116,19 +117,20 @@ public class Robot extends IterativeRobot {
     	if(triggerValue != 0) {
     		elevator.StopAuto();
     		elevator.SetSpeed(triggerValue);
-    	} else {
+    	} else {*/
     		if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
     			elevator.SetPresetTarget(PresetTarget.SCALE);
     		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
     			elevator.SetPresetTarget(PresetTarget.SWITCH);
     		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
     			elevator.SetPresetTarget(PresetTarget.BOTTOM);
-    		} else {
+    		}/* else {
     			elevator.SetSpeed(0);
     		}
     	}
 		elevator.Update();
-		
+		*/
+    		
     	// Gyro Section
     	
     	if(controllerDrive.WasClicked(ButtonName.B)) {
