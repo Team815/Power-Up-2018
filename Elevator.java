@@ -2,6 +2,7 @@ package org.usfirst.frc.team815.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -11,6 +12,8 @@ public class Elevator {
 	private ElevatorOutput elevatorMotors;
 	private Encoder encoder;
 	private PIDController elevatorController;
+	private DigitalInput limitSwitch;
+	private boolean calibrating;
 	
 	private static final int ENCODER_VALUE_NONE = -1;
 	private static final int ENCODER_VALUE_SCALE = 3400;
@@ -62,6 +65,8 @@ public class Elevator {
 		encoder = new Encoder(0, 1);
 		elevatorMotors = new ElevatorOutput(motorPort1, motorPort2);
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
+		limitSwitch = new DigitalInput(6);
+		calibrating = false;
 		elevatorController.setSetpoint(0);
 		elevatorController.enable();
 	}
@@ -81,5 +86,24 @@ public class Elevator {
 	
 	public void SetSpeed(double speed) {
 		elevatorMotors.SetSpeed(speed);
+	}
+	
+	public void InitiateManual() {
+		DisablePID();
+		calibrating = false;
+	}
+	
+	public void Calibrate() {
+		calibrating = true;
+		DisablePID();
+		elevatorMotors.SetSpeed(-0.5);
+	}
+	
+	public void CheckCalibration() {
+		if(calibrating && limitSwitch.get()) {
+			calibrating = false;
+			encoder.reset();
+			EnablePID();
+		}
 	}
 }

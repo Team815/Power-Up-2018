@@ -6,7 +6,7 @@ import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
 import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Switchboard.PotName;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
 
@@ -32,174 +32,178 @@ public class Robot extends IterativeRobot {
 	Tilt tilt = new Tilt(2);
 	//CameraServer server = CameraServer.getInstance();
 	
-    /**
-     * This function is run when the robot is first started up and should be
-     * used for any initialization code.
-     */
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
 	@Override
-    public void robotInit() {
-        //server.startAutomaticCapture(0);
-    }
-    
-    /**
-     * This function is run once each time the robot enters autonomous mode
-     */
-    @Override
-    public void autonomousInit() {
-    	gyro.SetPlayerAngle();
-    }
-
-    /**
-     * This function is called periodically during autonomous
-     */
-    @Override
-    public void autonomousPeriodic() {
-    	
-    	auto.Update();
-    	
-    	double horizontal = auto.GetHorizontal();
-    	double vertical = auto.GetVertical();
-    	double rotation = gyro.GetCompensation();
-    	double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
-    	
-    	drive.Update(horizontal, vertical, rotation, gyroValue);
-    }
-    
-    /**
-     * This function is called once each time the robot enters tele-operated mode
-     */
-    @Override
-    public void teleopInit(){
-    	
-    	gyro.ResetTargetAngle();
-    	lightRelay.set(Relay.Value.kOff);
-    	
-    	controllerDrive = controller0;
-    	controllerElevator = controller0;
-    	controllerTilt = controller0;
-    }
-
-    /**
-     * This function is called periodically during operator control
-     */
-    @Override
-    public void teleopPeriodic() {
-    	
-    	controller0.Update();
-    	//controller1.Update();
-    	//switchboard.Update();
-    	
-    	if(controller0.WasClicked(ButtonName.Start)) {
-    		if(controller0.IsToggled(ButtonName.Start)) {
-            	controllerElevator = controller0;
-        	} else {
-            	controllerElevator = controller0;
-        	}
-    	}
-    	
-    	// Tilt Section
-    	
-    	if(controllerTilt.WasClicked(ButtonName.Start)) {
+	public void robotInit() {
+	    //server.startAutomaticCapture(0);
+	}
+	
+	/**
+	 * This function is run once each time the robot enters autonomous mode
+	 */
+	@Override
+	public void autonomousInit() {
+		gyro.SetPlayerAngle();
+	}
+	
+	/**
+	 * This function is called periodically during autonomous
+	 */
+	@Override
+	public void autonomousPeriodic() {
+		
+		auto.Update();
+		
+		double horizontal = auto.GetHorizontal();
+		double vertical = auto.GetVertical();
+		double rotation = gyro.GetCompensation();
+		double gyroValue = auto.GetState() == State.Positioning ? gyro.GetAngle() : 0;
+		
+		drive.Update(horizontal, vertical, rotation, gyroValue);
+	}
+	
+	/**
+	 * This function is called once each time the robot enters tele-operated mode
+	 */
+	@Override
+	public void teleopInit(){
+		
+		gyro.ResetTargetAngle();
+		lightRelay.set(Relay.Value.kOff);
+		
+		controllerDrive = controller0;
+		controllerElevator = controller0;
+		controllerTilt = controller0;
+	}
+	
+	/**
+	 * This function is called periodically during operator control
+	 */
+	@Override
+	public void teleopPeriodic() {
+		
+		controller0.Update();
+		//controller1.Update();
+		//switchboard.Update();
+		
+		if(controller0.WasClicked(ButtonName.Start)) {
+			if(controller0.IsToggled(ButtonName.Start)) {
+		    	controllerElevator = controller0;
+			} else {
+		    	controllerElevator = controller0;
+			}
+		}
+		
+		// Tilt Section
+		
+		if(controllerTilt.WasClicked(ButtonName.Start)) {
 			tilt.StartTilting();
 		}
-    	
-    	tilt.Update();
-    	
-    	// Elevator Section
-    	
-    	boolean leftTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.LeftTrigger);
-    	boolean rightTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.RightTrigger);
-    	boolean leftTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.LeftTrigger);
-    	boolean rightTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.RightTrigger);
-    	double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
-    	double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
-    	double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
-    	
-    	if(leftTriggerActivated || rightTriggerActivated) {
-    		elevator.DisablePID();
-    	} else if (leftTriggerZeroed || rightTriggerZeroed) {
-    		if(triggerValue == 0) {
-    			elevator.EnablePID();
-    		}
-    	}
-    	
-    	if(triggerValue == leftTriggerValue) {
-    		triggerValue *= -1;
-    	}
-    	if(triggerValue != 0) {
-    		elevator.SetSpeed(triggerValue);
-    	} else {
-    		if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
-    			elevator.SetPresetTarget(PresetTarget.SCALE);
-    		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
-    			elevator.SetPresetTarget(PresetTarget.SWITCH);
-    		} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
-    			elevator.SetPresetTarget(PresetTarget.BOTTOM);
-    		}
-    	}
-    		
-    	// Gyro Section
-    	
-    	if(controllerDrive.WasClicked(ButtonName.B)) {
-    		gyro.SetPlayerAngle();
-    	}
-    	
-    	/*
-    	if(controllerDrive.WasClicked(ButtonName.Select)) {
-    		gyro.Calibrate();
-    		gyro.SetPlayerAngle();
-    	}
-    	*/
-    	
-    	if(controllerDrive.JustZeroed(AnalogName.RightJoyX)){
-    		gyro.ResetTargetAngle();
-    	}
-    	
-    	gyro.Update(controllerDrive.GetValue(AnalogName.RightJoyX) != 0);
-    	
-    	// Speed Control Section
-    	
-    	if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
-    		drive.SetMaxSpeed(controllerDrive);
-    	}
-    	
-    	
-    	// Drive Section
-    	
-    	double horizontal = 0;
-    	double vertical = 0;
-    	double rotation = 0;
-    	double gyroValue = 0;
-    	
-    	if(!controllerDrive.IsToggled(ButtonName.Select)) {
-	    	if(controllerDrive.IsToggled(ButtonName.X)) {
-	    		auto.Update();
-    			horizontal = auto.GetHorizontal();
-	    		vertical = auto.GetVertical();
-	    		rotation = gyro.GetCompensation();
-	    		gyroValue = 0;
-	    	} else {
-	    		horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);
-	    		vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
-	    		rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
-	    		rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
-	    		gyroValue = controllerDrive.IsToggled(ButtonName.A) ? 0 : gyro.GetAngle();
-	    	}
-    	}
-    	
-    	drive.Update(horizontal, vertical, rotation, gyroValue);
-    }
-    
-    /**
-     * This function is called periodically during test mode
-     */
-    @Override
-    public void testPeriodic() {
-    	
-    }
-    
-    @Override
-    public void disabledInit() {
-    	
-    }
+		
+		tilt.Update();
+		
+		// Elevator Section
+		
+		boolean leftTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.LeftTrigger);
+		boolean rightTriggerActivated = controllerElevator.JustActivated(Controller.AnalogName.RightTrigger);
+		boolean leftTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.LeftTrigger);
+		boolean rightTriggerZeroed = controllerElevator.JustZeroed(Controller.AnalogName.RightTrigger);
+		double rightTriggerValue = controllerElevator.GetValue(AnalogName.RightTrigger);
+		double leftTriggerValue = controllerElevator.GetValue(AnalogName.LeftTrigger);
+		double triggerValue = Math.max(rightTriggerValue, leftTriggerValue);
+		
+		if(leftTriggerActivated || rightTriggerActivated) {
+			elevator.InitiateManual();
+		} else if (leftTriggerZeroed || rightTriggerZeroed) {
+			if(triggerValue == 0) {
+				elevator.EnablePID();
+			}
+		}
+		
+		if(triggerValue == leftTriggerValue) {
+			triggerValue *= -1;
+		}
+		if(triggerValue != 0) {
+			elevator.SetSpeed(triggerValue);
+		} else {
+			if(controllerElevator.GetDpadDirection() == Dpad.Direction.Up) {
+				elevator.SetPresetTarget(PresetTarget.SCALE);
+			} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Right) {
+				elevator.SetPresetTarget(PresetTarget.SWITCH);
+			} else if(controllerElevator.GetDpadDirection() == Dpad.Direction.Down) {
+				elevator.SetPresetTarget(PresetTarget.BOTTOM);
+			}
+		}
+		
+		if(controllerElevator.WasClicked(Controller.ButtonName.RJ)) {
+			elevator.Calibrate();
+		}
+			
+		// Gyro Section
+		
+		if(controllerDrive.WasClicked(ButtonName.B)) {
+			gyro.SetPlayerAngle();
+		}
+		
+		/*
+		if(controllerDrive.WasClicked(ButtonName.Select)) {
+			gyro.Calibrate();
+			gyro.SetPlayerAngle();
+		}
+		*/
+		
+		if(controllerDrive.JustZeroed(AnalogName.RightJoyX)){
+			gyro.ResetTargetAngle();
+		}
+		
+		gyro.Update(controllerDrive.GetValue(AnalogName.RightJoyX) != 0);
+		
+		// Speed Control Section
+		
+		if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
+			drive.SetMaxSpeed(controllerDrive);
+		}
+		
+		
+		// Drive Section
+		
+		double horizontal = 0;
+		double vertical = 0;
+		double rotation = 0;
+		double gyroValue = 0;
+		
+		if(!controllerDrive.IsToggled(ButtonName.Select)) {
+			if(controllerDrive.IsToggled(ButtonName.X)) {
+				auto.Update();
+				horizontal = auto.GetHorizontal();
+				vertical = auto.GetVertical();
+				rotation = gyro.GetCompensation();
+				gyroValue = 0;
+			} else {
+				horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);
+				vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
+				rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
+				rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
+				gyroValue = controllerDrive.IsToggled(ButtonName.A) ? 0 : gyro.GetAngle();
+			}
+		}
+		
+		drive.Update(horizontal, vertical, rotation, gyroValue);
+	}
+	
+	/**
+	 * This function is called periodically during test mode
+	 */
+	@Override
+	public void testPeriodic() {
+		
+	}
+	
+	@Override
+	public void disabledInit() {
+		
+	}
 }
