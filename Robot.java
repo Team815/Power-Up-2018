@@ -25,6 +25,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerDrive;
 	//Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
+	Claw claw = new Claw();
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
@@ -94,6 +95,30 @@ public class Robot extends IterativeRobot {
 		    	controllerElevator = controller0;
 			} else {
 		    	controllerElevator = controller0;
+			}
+		}
+		
+		//	Claw Section
+		
+		if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
+			claw.stopClaw();
+		}
+		
+		if(controller0.IsPressed(ButtonName.X)) {
+			if(claw.getOpen()) {
+				claw.closeClaw();
+			}
+			else if(!claw.getOpen()) {
+				claw.openClaw();
+			}
+		}
+		
+		if(controller0.IsPressed(ButtonName.Y)) {
+			if(claw.isRolling()) {
+				claw.startRolling();
+			}
+			else if(!claw.isRolling()) {
+				claw.stopRolling();
 			}
 		}
 		
@@ -178,19 +203,11 @@ public class Robot extends IterativeRobot {
 		double gyroValue = 0;
 		
 		if(!controllerDrive.IsToggled(ButtonName.Select)) {
-			if(controllerDrive.IsToggled(ButtonName.X)) {
-				auto.Update();
-				horizontal = auto.GetHorizontal();
-				vertical = auto.GetVertical();
-				rotation = gyro.GetCompensation();
-				gyroValue = 0;
-			} else {
-				horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);
-				vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
-				rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
-				rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
-				gyroValue = controllerDrive.IsToggled(ButtonName.A) ? 0 : gyro.GetAngle();
-			}
+			horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);
+			vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
+			rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
+			rotation = rotation == 0 ? gyro.GetCompensation() : rotation;
+			gyroValue = controllerDrive.IsToggled(ButtonName.A) ? 0 : gyro.GetAngle();
 		}
 		
 		drive.Update(horizontal, vertical, rotation, gyroValue);
