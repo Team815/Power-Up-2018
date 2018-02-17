@@ -113,13 +113,14 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		
-		if(controller0.IsPressed(ButtonName.Y)) {
-			if(claw.isRolling()) {
-				claw.startRolling();
-			}
-			else if(!claw.isRolling()) {
-				claw.stopRolling();
-			}
+		if(controller0.IsPressed(ButtonName.RB) && claw.isRolling()) {
+			claw.rollForward();
+		}
+		else if (controller0.IsPressed(ButtonName.LB) && claw.isRolling()) {
+			claw.rollBackwards();
+		}
+		else if(!claw.isRolling()) {
+			claw.stopRolling();
 		}
 		
 		// Tilt Section
@@ -190,9 +191,9 @@ public class Robot extends IterativeRobot {
 		
 		// Speed Control Section
 		
-		if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
-			drive.SetMaxSpeed(controllerDrive);
-		}
+//		if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
+//			drive.SetMaxSpeed(controllerDrive);
+//		}
 		
 		
 		// Drive Section

@@ -1,13 +1,8 @@
 package org.usfirst.frc.team815.robot;
 
-import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
@@ -45,8 +40,13 @@ public class Claw {
 		clawTimer.reset();
 	}
 	
-	public void startRolling() {
+	public void rollForward() {
 		rollerMotor.set(1);
+		isRolling = true;
+	}
+	
+	public void rollBackwards() {
+		rollerMotor.set(-1);
 		isRolling = true;
 	}
 	
