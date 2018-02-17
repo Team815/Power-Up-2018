@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
-	public final static double CLAW_MOVEMENT_TIME = 1000;
+	public final static double CLAW_MOVEMENT_TIME = 1;
 	
 	private WPI_VictorSPX clawMotor;
 	private WPI_VictorSPX rollerMotor;
