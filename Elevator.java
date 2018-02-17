@@ -5,11 +5,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
 
 public class Elevator {
 	
-	private ElevatorOutput elevatorMotors;
+	private PIDOutputMulti<WPI_VictorSPX> elevatorMotors;
 	private Encoder encoder;
 	private PIDController elevatorController;
 	private DigitalInput limitSwitch;
@@ -40,31 +39,12 @@ public class Elevator {
 			return encoderTarget;
 		}
 	}
-	
-	private class ElevatorOutput implements PIDOutput {
-		private WPI_VictorSPX motor1;
-		private WPI_VictorSPX motor2;
-		
-		public ElevatorOutput(int motorPort1, int motorPort2) {
-			motor1 = new  WPI_VictorSPX(motorPort1);
-			motor2 = new WPI_VictorSPX(motorPort2);
-		}
-		
-		@Override
-		public void pidWrite(double output) {
-			motor1.pidWrite(output);
-			motor2.pidWrite(output);
-		}
-		
-		public void SetSpeed(double speed) {
-			motor1.set(speed);
-			motor2.set(speed);
-		}
-	}
  	
 	public Elevator(int motorPort1, int motorPort2) {
 		encoder = new Encoder(0, 1);
-		elevatorMotors = new ElevatorOutput(motorPort1, motorPort2);
+		elevatorMotors = new PIDOutputMulti<WPI_VictorSPX>();
+		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort1));
+		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort2));
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
 		limitSwitch = new DigitalInput(6);
 		calibrating = false;
