@@ -19,9 +19,10 @@ public class Elevator {
 	private static final int ENCODER_VALUE_SCALE = 3400;
 	private static final int ENCODER_VALUE_SWITCH = 700;
 	private static final int ENCODER_VALUE_BOTTOM = 0;
-	static final double P = 0.003;
-	static final double I = 0.0;
-	static final double D = 0.0;
+	private static final double P = 0.003;
+	private static final double I = 0.0;
+	private static final double D = 0.0;
+	private static final double SPEED_CALIBRATE = -0.5;
 	
 	public static enum PresetTarget {
 		NONE(ENCODER_VALUE_NONE),
@@ -67,8 +68,7 @@ public class Elevator {
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
 		limitSwitch = new DigitalInput(6);
 		calibrating = false;
-		elevatorController.setSetpoint(0);
-		elevatorController.enable();
+		EnablePID();
 	}
 	
 	public void SetPresetTarget(PresetTarget presetTargetIn) {
@@ -80,23 +80,19 @@ public class Elevator {
 		elevatorController.enable();
 	}
 	
-	public void DisablePID() {
-		elevatorController.disable();
-	}
-	
 	public void SetSpeed(double speed) {
 		elevatorMotors.SetSpeed(speed);
 	}
 	
 	public void InitiateManual() {
-		DisablePID();
+		elevatorController.disable();
 		calibrating = false;
 	}
 	
 	public void Calibrate() {
 		calibrating = true;
-		DisablePID();
-		elevatorMotors.SetSpeed(-0.5);
+		elevatorController.disable();
+		elevatorMotors.SetSpeed(SPEED_CALIBRATE);
 	}
 	
 	public void CheckCalibration() {
