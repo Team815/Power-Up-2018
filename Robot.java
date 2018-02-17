@@ -23,7 +23,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerLift;
 	Controller controllerPickup;
 	Controller controllerDrive;
-	//Switchboard switchboard = new Switchboard(2);
+	Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 0, 3);
 	Relay lightRelay = new Relay(0, Relay.Direction.kForward);
 	Gyro gyro = new Gyro(1);
@@ -48,7 +48,17 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void autonomousInit() {
-    	auto.StartAuto();
+    	int autoState = switchboard.GetBinaryValue();
+    	
+    	System.out.println(autoState);
+    	
+    	if(autoState == 1) {		// Cross auto line
+    		auto.CrossAutoLine();
+    	} else if(autoState == 2) {	// Score on switch 
+    		auto.ScoreOnSwitch();
+    	} else if(autoState == 4) {	// Score on scale
+    		auto.ScoreOnScale();
+    	}
     }
 
     /**
