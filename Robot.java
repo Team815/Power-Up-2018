@@ -106,18 +106,12 @@ public class Robot extends IterativeRobot {
 //			claw.stopClaw();
 //		}
 		
-		if(controllerClaw.IsPressed(ButtonName.X)) {
+		if(controllerClaw.WasClicked(ButtonName.X)) {
 			if(claw.getOpen()) {
 				claw.closeClaw();
-				if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
-					claw.stopClaw();
-				}
 			}
 			else if(!claw.getOpen()) {
 				claw.openClaw();
-				if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
-					claw.stopClaw();
-				}
 			}
 		}
 		
