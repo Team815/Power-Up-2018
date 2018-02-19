@@ -6,17 +6,22 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
-	public final static double CLAW_MOVEMENT_TIME = 1;
+	public final static double CLAW_MOVEMENT_TIME = .5;
 	
 	private WPI_VictorSPX clawMotor;
-	private WPI_VictorSPX rollerMotor;
+	private WPI_VictorSPX rollerMotor1;
+	private WPI_VictorSPX rollerMotor2;
 	private Boolean open;
 	private Boolean isRolling;
+	
+
 	private Timer clawTimer;
 	
 	public Claw() {
 		clawMotor = new WPI_VictorSPX(1);
-		rollerMotor = new WPI_VictorSPX(2);
+		rollerMotor1 = new WPI_VictorSPX(2);
+		rollerMotor2 = new WPI_VictorSPX(11);
+		rollerMotor2.setInverted(true);
 		open = true;
 		isRolling = false;
 		clawTimer = new Timer();
@@ -40,18 +45,21 @@ public class Claw {
 		clawTimer.reset();
 	}
 	
-	public void rollForward() {
-		rollerMotor.set(1);
+	public void rollForwards() {
+		rollerMotor1.set(1);
+		rollerMotor2.set(1);
 		isRolling = true;
 	}
 	
 	public void rollBackwards() {
-		rollerMotor.set(-1);
+		rollerMotor1.set(-1);
+		rollerMotor2.set(-1);
 		isRolling = true;
 	}
 	
 	public void stopRolling() {
-		rollerMotor.set(0);
+		rollerMotor1.set(0);
+		rollerMotor2.set(0);
 		isRolling = false;
 	}
 
@@ -62,7 +70,6 @@ public class Claw {
 	public Boolean getOpen() {
 		return open;
 	}
-
 	public Boolean isRolling() {
 		return isRolling;
 	}

@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.Encoder;
 public class Tilt {
 	private static final int MAX_INWARD_TILT_ROTATION_VALUE = 0;
 	private static final int NO_TILT_ROTATION_VALUE = -5200;
-	private WPI_VictorSPX tiltMotor;
+	private WPI_VictorSPX tiltMotor1;
+	private WPI_VictorSPX tiltMotor2;
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	private State state;
@@ -19,8 +20,9 @@ public class Tilt {
 		MOVING_DOWN
 	}
 	
-	public Tilt(int motorPort) {
-		tiltMotor = new  WPI_VictorSPX(motorPort);
+	public Tilt(int motorPort1, int motorPort2) {
+		tiltMotor1 = new  WPI_VictorSPX(motorPort1);
+		tiltMotor2 = new  WPI_VictorSPX(motorPort2);
 		leftEncoder = new Encoder(4, 5);
 		rightEncoder = new Encoder(2, 3);
 		state = State.DOWN;
@@ -30,12 +32,14 @@ public class Tilt {
 		switch(state) {
 		case UP:
 		case MOVING_UP:
-			tiltMotor.set(1);
+			tiltMotor1.set(1);
+			tiltMotor2.set(2);
 			state = State.MOVING_DOWN;
 			break;
 		case DOWN:
 		case MOVING_DOWN:
-			tiltMotor.set(-1);
+			tiltMotor1.set(-1);
+			tiltMotor2.set(-1);
 			state = State.MOVING_UP;
 			break;
 		}
@@ -59,7 +63,8 @@ public class Tilt {
 	}
 	
 	public void StopTilting() {		
-		tiltMotor.set(0);
+		tiltMotor1.set(0);
+		tiltMotor2.set(0);
 		switch(state) {
 		case UP:
 		case MOVING_UP:

@@ -23,6 +23,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
+	Controller controllerClaw;
 	//Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
 	Claw claw = new Claw();
@@ -30,7 +31,7 @@ public class Robot extends IterativeRobot {
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
 	Elevator elevator = new Elevator(5,6);
-	Tilt tilt = new Tilt(2);
+	Tilt tilt = new Tilt(8, 9);					// Port 9 needs to be assigned as well
 	//CameraServer server = CameraServer.getInstance();
 	
 	/**
@@ -78,6 +79,7 @@ public class Robot extends IterativeRobot {
 		controllerDrive = controller0;
 		controllerElevator = controller0;
 		controllerTilt = controller0;
+		controllerClaw = controller0;
 	}
 	
 	/**
@@ -100,28 +102,42 @@ public class Robot extends IterativeRobot {
 		
 		//	Claw Section
 		
-		if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
-			claw.stopClaw();
-		}
+//		if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
+//			claw.stopClaw();
+//		}
 		
-		if(controller0.IsPressed(ButtonName.X)) {
+		if(controllerClaw.IsPressed(ButtonName.X)) {
 			if(claw.getOpen()) {
 				claw.closeClaw();
+				if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
+					claw.stopClaw();
+				}
 			}
 			else if(!claw.getOpen()) {
 				claw.openClaw();
+				if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
+					claw.stopClaw();
+				}
 			}
 		}
 		
-		if(controller0.IsPressed(ButtonName.RB) && claw.isRolling()) {
-			claw.rollForward();
-		}
-		else if (controller0.IsPressed(ButtonName.LB) && claw.isRolling()) {
+		if(controllerClaw.IsPressed(ButtonName.RB)) {
 			claw.rollBackwards();
 		}
-		else if(!claw.isRolling()) {
+		else if(controllerClaw.WasReleased(ButtonName.RB)) {
 			claw.stopRolling();
 		}
+		if(controllerClaw.IsPressed(ButtonName.LB)) {
+			claw.rollForwards();
+		}
+		else if(controllerClaw.WasReleased(ButtonName.LB)) {
+			claw.stopRolling();
+		}
+		
+		
+//		else if(!claw.isRolling()) {
+//			claw.stopRolling();
+//		}
 		
 		// Tilt Section
 		
