@@ -13,7 +13,6 @@ public class Autonomous {
 	}
 	
 	Gyro gyro;
-	Camera camera = new Camera();
 	Relay lightRelay;
 	private double horizontal = 0;
 	private double vertical = 0;
@@ -30,7 +29,6 @@ public class Autonomous {
 		state = startingState;
 		startingAngle = gyro.GetAngle();
 		if(startingState == State.Aligning) {
-			camera.StartCamera();
     		lightRelay.set(Relay.Value.kOn);
 		}
 		timer.reset();
@@ -40,8 +38,6 @@ public class Autonomous {
 	public void Update() {
 		if(state == State.Positioning) {
 			GetIntoPosition();
-		} else if(state == State.Aligning) {
-			Align(camera.ReadBuffer());
 		} else if(state == State.Inserting) {
 			Insert();
 		} else if(state == State.Done) {
@@ -57,7 +53,6 @@ public class Autonomous {
 		if(timer.get() > TIMER_LIMIT) {
 			timer.stop();
 			state = State.Aligning;
-			camera.StartCamera();
 			lightRelay.set(Relay.Value.kOn);
 		} else {
 			vertical = POSITION_SPEED;
