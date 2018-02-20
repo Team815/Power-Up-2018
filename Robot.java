@@ -124,16 +124,6 @@ public class Robot extends IterativeRobot {
 		}
 		
 		elevator.CheckCalibration();
-			
-		// Gyro Section
-		
-		if(controllerDrive.WasClicked(ButtonName.B)) {
-			//drive.SetPlayerAngle();
-		}
-		
-		if(controllerDrive.JustZeroed(AnalogName.RightJoyX)){
-			//drive.ResetTargetAngle();
-		}
 		
 		// Speed Control Section
 		
