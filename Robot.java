@@ -21,10 +21,10 @@ public class Robot extends IterativeRobot {
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
-	Drive drive = new Drive(4, 7, 0, 3);
+	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto = new Autonomous();
 	Elevator elevator = new Elevator(5,6);
-	Tilt tilt = new Tilt(2);
+	Tilt tilt = new Tilt();
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -122,15 +122,17 @@ public class Robot extends IterativeRobot {
 		if(controllerElevator.WasClicked(Controller.ButtonName.RJ)) {
 			elevator.Calibrate();
 		}
+		
+		elevator.CheckCalibration();
 			
 		// Gyro Section
 		
 		if(controllerDrive.WasClicked(ButtonName.B)) {
-			drive.SetPlayerAngle();
+			//drive.SetPlayerAngle();
 		}
 		
 		if(controllerDrive.JustZeroed(AnalogName.RightJoyX)){
-			drive.ResetTargetAngle();
+			//drive.ResetTargetAngle();
 		}
 		
 		// Speed Control Section
@@ -142,11 +144,7 @@ public class Robot extends IterativeRobot {
 		
 		// Drive Section
 		
-		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
-		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
-		double rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
-		
-		drive.Update(horizontal, vertical, rotation);
+		drive.Update(controllerDrive);
 	}
 	
 	/**

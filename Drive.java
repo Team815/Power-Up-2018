@@ -1,11 +1,13 @@
 package org.usfirst.frc.team815.robot;
 
+import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 public class Drive {
@@ -13,15 +15,22 @@ public class Drive {
 	private ADXRS450_Gyro gyro;
 	private DriveOutput driveOutput;
 	private PIDController driveController;
+	private Timer timer;
+	private double rotationCompensation;
 	private double speedMultiplier = 1;
 	private static final double MIN_MULTIPLIER = 0.2;
 	private static final double MAX_MULTIPLIER = 1;
 	private static final double MULTIPLIER_INCREMENT = 0.01;
+	private static final double P = 0.03;
+	private static final double I = 0.0;
+	private static final double D = 0.0;
+	private static final double PID_DELAY = 0.5;
 	
 	private class DriveOutput implements PIDOutput {
 
 		@Override
 		public void pidWrite(double output) {
+			rotationCompensation = output;
 		}
 		
 	}
@@ -31,9 +40,11 @@ public class Drive {
 		WPI_VictorSPX talonRearRight = new WPI_VictorSPX(rearRightId);
 		WPI_VictorSPX talonFrontLeft = new WPI_VictorSPX(frontLeftId);
 		WPI_VictorSPX talonRearLeft = new WPI_VictorSPX(rearLeftId);
+		timer = new Timer();
 		gyro = new ADXRS450_Gyro();
+		driveOutput = new DriveOutput();
     	drive = new MecanumDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
-    	driveController = new PIDController(0.003, 0.0, 0.0, gyro, driveOutput);
+    	driveController = new PIDController(P, I, D, gyro, driveOutput);
     	driveController.enable();
 	}
 	
@@ -47,7 +58,28 @@ public class Drive {
 		drive.setMaxOutput(speedMultiplier);
     }
 	
-	public void Update(double horizontal, double vertical, double rotation) {
-    	drive.driveCartesian(horizontal, vertical, rotation);
+	public void Update(Controller controller) {
+		double horizontal = controller.GetValue(AnalogName.LeftJoyX);		
+		double vertical = -controller.GetValue(AnalogName.LeftJoyY);
+		double rotation = controller.GetValue(AnalogName.RightJoyX);
+		
+		if(controller.JustActivated(Controller.AnalogName.RightJoyX)) {
+			driveController.disable();
+		} else if (controller.JustZeroed(Controller.AnalogName.RightJoyX)) {
+			timer.start();
+		}
+		
+		if(timer.get() > PID_DELAY) {
+			timer.stop();
+			timer.reset();
+			driveController.setSetpoint(gyro.getAngle());
+			driveController.enable();
+		}
+		
+		if(driveController.isEnabled()) {
+			rotation += rotationCompensation;
+		}
+		
+    	drive.driveCartesian(horizontal, vertical, rotation, -gyro.getAngle());
 	}
 }
