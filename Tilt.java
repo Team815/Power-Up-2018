@@ -6,10 +6,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 
 public class Tilt {
-	//	private static final int MAX_INWARD_TILT_ROTATION_VALUE = 0;
-	private static final int NO_TILT_ROTATION_VALUE = -5200;
-	private WPI_VictorSPX leftTiltMotor;
-	private WPI_VictorSPX rightTiltMotor;
+	private static final int NO_TILT_ROTATION_VALUE = -5000;
+	private static final int LEFT_TILT_MOTOR_PORT = 8;
+	private static final int RIGHT_TILT_MOTOR_PORT = 9;
+	private static final int LEFT_LIMIT_SWITCH_PORT = 8;
+	private static final int RIGHT_LIMIT_SWITCH_PORT = 7;
+	private static final int LEFT_ENCODER_PORT_A = 4;
+	private static final int LEFT_ENCODER_PORT_B = 5;
+	private static final int RIGHT_ENCODER_PORT_A = 2;
+	private static final int RIGHT_ENCODER_PORT_B = 3;
+	private PIDOutputMulti<WPI_VictorSPX> motors;
 	private DigitalInput leftLimitSwitch;
 	private DigitalInput rightLimitSwitch;
 	private Encoder leftEncoder;
@@ -20,16 +26,20 @@ public class Tilt {
 		UP,
 		DOWN,
 		MOVING_UP,
-		MOVING_DOWN
+		MOVING_DOWN,
 	}
 	
 	public Tilt () {
-		leftTiltMotor = new  WPI_VictorSPX(8);
-		rightTiltMotor = new WPI_VictorSPX(9);
-		leftLimitSwitch = new DigitalInput(0);	// Adjust once input value is known
-		rightLimitSwitch = new DigitalInput(0);	// Adjust once input value is known
-		leftEncoder = new Encoder(4, 5);
-		rightEncoder = new Encoder(2, 3);
+		WPI_VictorSPX leftTiltMotor = new WPI_VictorSPX(LEFT_TILT_MOTOR_PORT);
+		WPI_VictorSPX rightTiltMotor = new WPI_VictorSPX(RIGHT_TILT_MOTOR_PORT);
+		motors = new PIDOutputMulti<WPI_VictorSPX>();
+		motors.AddMotor(leftTiltMotor);
+		motors.AddMotor(rightTiltMotor);
+		leftLimitSwitch = new DigitalInput(LEFT_LIMIT_SWITCH_PORT);
+		rightLimitSwitch = new DigitalInput(RIGHT_LIMIT_SWITCH_PORT);
+		leftEncoder = new Encoder(LEFT_ENCODER_PORT_A, LEFT_ENCODER_PORT_B);
+		rightEncoder = new Encoder(RIGHT_ENCODER_PORT_A, RIGHT_ENCODER_PORT_B);
+		leftTiltMotor.setInverted(true);
 		state = State.DOWN;
 	}
 	
@@ -37,36 +47,27 @@ public class Tilt {
 		switch(state) {
 		case UP:
 		case MOVING_UP:
-			leftTiltMotor.set(1);
-			rightTiltMotor.set(1);
+			motors.SetSpeed(1);
 			state = State.MOVING_DOWN;
 			break;
 		case DOWN:
 		case MOVING_DOWN:
-			leftTiltMotor.set(-1);
-			rightTiltMotor.set(-1);
+			motors.SetSpeed(-1);
 			state = State.MOVING_UP;
 			break;
 		}
 	}
 	
 	public void Update() {
-		double minValue = Math.min(leftEncoder.get(), rightEncoder.get());
-		double maxValue = Math.max(leftEncoder.get(), rightEncoder.get());
-		
+		double minEncoderValue = Math.min(leftEncoder.get(), rightEncoder.get());
 		switch(state) {
 		case MOVING_UP:
-			if(minValue < NO_TILT_ROTATION_VALUE)
-				StopTilting(true, true);
+			if(minEncoderValue < NO_TILT_ROTATION_VALUE)
+				StopTilting();
 			break;
 		case MOVING_DOWN:
-			if(leftLimitSwitch.get()) {
-				StopTilting(true, false);
-				leftEncoder.reset();
-			}
-			if(rightLimitSwitch.get()) {
-				StopTilting(false, true);
-				rightEncoder.reset();
+			if(leftLimitSwitch.get() || rightLimitSwitch.get()) {
+				StopTilting();
 			}
 			break;
 		default:
@@ -74,13 +75,8 @@ public class Tilt {
 		}
 	}
 	
-	public void StopTilting(boolean stopLeftTiltMotor, boolean stopRightTiltMotor) {		
-		if(stopLeftTiltMotor) {
-			leftTiltMotor.set(0);
-		}
-		if(stopRightTiltMotor) {
-			rightTiltMotor.set(0);
-		}
+	public void StopTilting() {	
+		motors.SetSpeed(0);
 		switch(state) {
 		case UP:
 		case MOVING_UP:
@@ -88,6 +84,8 @@ public class Tilt {
 			break;
 		case DOWN:
 		case MOVING_DOWN:
+			leftEncoder.reset();
+			rightEncoder.reset();
 			state = State.DOWN;
 		}
 	}
