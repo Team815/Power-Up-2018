@@ -14,9 +14,6 @@ public class Claw {
 	private Boolean open;
 	private Boolean isRolling;
 	
-
-	private Timer clawTimer;
-	
 	public Claw() {
 		clawMotor = new WPI_VictorSPX(1);
 		rollerMotor1 = new WPI_VictorSPX(2);
@@ -24,27 +21,20 @@ public class Claw {
 		rollerMotor2.setInverted(true);
 		open = false;
 		isRolling = false;
-		clawTimer = new Timer();
 	}
 	
 	public void openClaw() {
 		clawMotor.set(-1);
-		clawTimer.start();
 		open = true;
-		System.out.println("Open " + clawTimer.get());
 	}
 	
 	public void closeClaw() {
 		clawMotor.set(1);
-		clawTimer.start();
 		open = false;
-		System.out.println("Closed " + clawTimer.get());
 	}
 	
 	public void stopClaw() {
 		clawMotor.set(0);
-		clawTimer.stop();
-		clawTimer.reset();
 	}
 	
 	public void rollForwards() {
@@ -63,10 +53,6 @@ public class Claw {
 		rollerMotor1.set(0);
 		rollerMotor2.set(0);
 		isRolling = false;
-	}
-
-	public double getClawTimer() {
-		return clawTimer.get();
 	}
 
 	public Boolean getOpen() {

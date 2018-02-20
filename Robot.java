@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.Relay;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
-	//Controller controller1 = new Controller(1);
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
@@ -31,7 +30,7 @@ public class Robot extends IterativeRobot {
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
 	Elevator elevator = new Elevator(5,6);
-	Tilt tilt = new Tilt(8, 9);					// Port 9 needs to be assigned as well
+	Tilt tilt = new Tilt(8, 9);
 	//CameraServer server = CameraServer.getInstance();
 	
 	/**
@@ -89,7 +88,6 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		
 		controller0.Update();
-		//controller1.Update();
 		//switchboard.Update();
 		
 		if(controller0.WasClicked(ButtonName.Start)) {
@@ -101,10 +99,6 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//	Claw Section
-		
-//		if(claw.getClawTimer() > Claw.CLAW_MOVEMENT_TIME) {
-//			claw.stopClaw();
-//		}
 		
 		if(controllerClaw.WasClicked(ButtonName.X)) {
 			if(claw.getOpen()) {
@@ -128,10 +122,6 @@ public class Robot extends IterativeRobot {
 			claw.stopRolling();
 		}
 		
-		
-//		else if(!claw.isRolling()) {
-//			claw.stopRolling();
-//		}
 		
 		// Tilt Section
 		
