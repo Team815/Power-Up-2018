@@ -63,6 +63,11 @@ public class Drive {
 		double vertical = -controller.GetValue(AnalogName.LeftJoyY);
 		double rotation = controller.GetValue(AnalogName.RightJoyX);
 		
+		if(controller.WasClicked(Controller.ButtonName.B)) {
+			gyro.reset();
+			driveController.setSetpoint(gyro.getAngle());
+		}
+		
 		if(controller.JustActivated(Controller.AnalogName.RightJoyX)) {
 			driveController.disable();
 		} else if (controller.JustZeroed(Controller.AnalogName.RightJoyX)) {
