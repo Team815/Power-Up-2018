@@ -29,7 +29,7 @@ public class Robot extends IterativeRobot {
 	Gyro gyro = new Gyro(1);
 	Autonomous auto = new Autonomous(gyro, lightRelay);
 	Elevator elevator = new Elevator(5,6);
-	Tilt tilt = new Tilt(2);
+	Tilt tilt = new Tilt();
 	//CameraServer server = CameraServer.getInstance();
 	
 	/**
