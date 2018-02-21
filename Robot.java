@@ -1,5 +1,6 @@
 package org.usfirst.frc.team815.robot;
 
+import org.usfirst.frc.team815.robot.Claw.RollerDirection;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
@@ -81,31 +82,29 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		
-//		Claw Section
+		// Claw Section
 		
-			if(controllerClaw.WasClicked(ButtonName.X)) {
-				if(claw.getOpen()) {
-					claw.closeClaw();
-				}
-				else if(!claw.getOpen()) {
-					claw.openClaw();
-				}
-			}
-			else if(claw.timer.get() > Claw.CLAW_MOVEMENT_TIME)
-				claw.stopClaw();
-			
+		if(controllerClaw.WasClicked(ButtonName.X)) {
+			claw.toggleClaw();
+		}
+		
+		claw.update();
+		
+		// Roller Subsection
+		
+		if(controllerClaw.WasReleased(ButtonName.RB) || controllerClaw.WasReleased(ButtonName.LB)) {
 			if(controllerClaw.IsPressed(ButtonName.RB)) {
-				claw.rollBackwards();
+				claw.setRollerDirection(RollerDirection.BACKWARD);
+			} else if(controllerClaw.IsPressed(ButtonName.LB)) {
+				claw.setRollerDirection(RollerDirection.FORWARD);
+			} else {
+				claw.setRollerDirection(RollerDirection.STOPPED);
 			}
-			else if(controllerClaw.WasReleased(ButtonName.RB)) {
-				claw.stopRolling();
-			}
-			if(controllerClaw.IsPressed(ButtonName.LB)) {
-				claw.rollForwards();
-			}
-			else if(controllerClaw.WasReleased(ButtonName.LB)) {
-				claw.stopRolling();
-			}
+		} else if(controllerClaw.WasClicked(ButtonName.RB)) {
+			claw.setRollerDirection(RollerDirection.BACKWARD);
+		} else if(controllerClaw.WasClicked(ButtonName.LB)) {
+			claw.setRollerDirection(RollerDirection.FORWARD);
+		}
 		
 		// Tilt Section
 		

@@ -6,26 +6,50 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
-	public final static double CLAW_MOVEMENT_TIME = .5;
+	private final static double CLAW_MOVEMENT_TIME = 0.5;
 	
 	private WPI_VictorSPX clawMotor;
-	private WPI_VictorSPX rollerMotor1;
-	private WPI_VictorSPX rollerMotor2;
+	private PIDOutputMulti<WPI_VictorSPX> rollerMotors;
 	private Boolean open;
-	private Boolean isRolling;
-	public Timer timer;
+	private Timer timer;
+	
+	public enum RollerDirection {
+		FORWARD(1),
+		BACKWARD(-1),
+		STOPPED(0);
+		
+		double directionValue;
+		
+		private RollerDirection(double directionValueIn) {
+			directionValue = directionValueIn;
+		}
+		
+		public double getDirectionValue() {
+			return directionValue;
+		}
+	}
 	
 	public Claw() {
 		clawMotor = new WPI_VictorSPX(1);
-		rollerMotor1 = new WPI_VictorSPX(2);
-		rollerMotor2 = new WPI_VictorSPX(11);
+		WPI_VictorSPX rollerMotor1 = new WPI_VictorSPX(2);
+		WPI_VictorSPX rollerMotor2 = new WPI_VictorSPX(11);
 		rollerMotor2.setInverted(true);
+		rollerMotors = new PIDOutputMulti<WPI_VictorSPX>();
+		rollerMotors.AddMotor(rollerMotor1);
+		rollerMotors.AddMotor(rollerMotor2);
 		open = false;
-		isRolling = false;
 		timer = new Timer();
 	}
 	
-	public void openClaw() {
+	public void toggleClaw() {
+		if(open) {
+			closeClaw();
+		} else {
+			openClaw();
+		}
+	}
+	
+	private void openClaw() {
 		timer.start();
 		clawMotor.set(-1);
 		open = true;
@@ -37,33 +61,18 @@ public class Claw {
 		open = false;
 	}
 	
-	public void stopClaw() {
+	public void update() {
+		if(timer.get() > CLAW_MOVEMENT_TIME)
+			stopClaw();
+	}
+	
+	private void stopClaw() {
 		clawMotor.set(0);
 		timer.stop();
+		timer.reset();
 	}
 	
-	public void rollForwards() {
-		rollerMotor1.set(1);
-		rollerMotor2.set(1);
-		isRolling = true;
-	}
-	
-	public void rollBackwards() {
-		rollerMotor1.set(-1);
-		rollerMotor2.set(-1);
-		isRolling = true;
-	}
-	
-	public void stopRolling() {
-		rollerMotor1.set(0);
-		rollerMotor2.set(0);
-		isRolling = false;
-	}
-
-	public Boolean getOpen() {
-		return open;
-	}
-	public Boolean isRolling() {
-		return isRolling;
+	public void setRollerDirection(RollerDirection rollerDirection) {
+		rollerMotors.SetSpeed(rollerDirection.getDirectionValue());
 	}
 }
