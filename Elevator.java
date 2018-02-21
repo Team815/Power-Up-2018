@@ -48,6 +48,7 @@ public class Elevator {
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
 		limitSwitch = new DigitalInput(6);
 		calibrating = false;
+		elevatorController.setOutputRange(-.3,  .3);
 		EnablePID();
 	}
 	

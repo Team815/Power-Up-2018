@@ -1,5 +1,6 @@
 package org.usfirst.frc.team815.robot;
 
+import org.usfirst.frc.team815.robot.Claw.RollerDirection;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import org.usfirst.frc.team815.robot.Dpad.Direction;
@@ -18,11 +19,13 @@ import edu.wpi.first.wpilibj.Relay;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
+	Controller controllerClaw;
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto = new Autonomous();
+	Claw claw = new Claw();
 	Elevator elevator = new Elevator(5,6);
 	Tilt tilt = new Tilt();
 	
@@ -55,6 +58,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		
+		controllerClaw = controller0;
 		controllerDrive = controller0;
 		controllerElevator = controller0;
 		controllerTilt = controller0;
@@ -76,6 +80,30 @@ public class Robot extends IterativeRobot {
 			} else {
 		    	controllerElevator = controller0;
 			}
+		}
+		
+		// Claw Section
+		
+		if(controllerClaw.WasClicked(ButtonName.X)) {
+			claw.toggleClaw();
+		}
+		
+		claw.update();
+		
+		// Roller Subsection
+		
+		if(controllerClaw.WasReleased(ButtonName.RB) || controllerClaw.WasReleased(ButtonName.LB)) {
+			if(controllerClaw.IsPressed(ButtonName.RB)) {
+				claw.setRollerDirection(RollerDirection.BACKWARD);
+			} else if(controllerClaw.IsPressed(ButtonName.LB)) {
+				claw.setRollerDirection(RollerDirection.FORWARD);
+			} else {
+				claw.setRollerDirection(RollerDirection.STOPPED);
+			}
+		} else if(controllerClaw.WasClicked(ButtonName.RB)) {
+			claw.setRollerDirection(RollerDirection.BACKWARD);
+		} else if(controllerClaw.WasClicked(ButtonName.LB)) {
+			claw.setRollerDirection(RollerDirection.FORWARD);
 		}
 		
 		// Tilt Section
