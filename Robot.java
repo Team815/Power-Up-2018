@@ -3,11 +3,8 @@ package org.usfirst.frc.team815.robot;
 import org.usfirst.frc.team815.robot.Claw.RollerDirection;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
-import org.usfirst.frc.team815.robot.Dpad.Direction;
 import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
-import org.usfirst.frc.team815.robot.Switchboard.PotName;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Relay;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -171,12 +168,6 @@ public class Robot extends IterativeRobot {
 		
 		elevator.CheckCalibration();
 		
-		// Speed Control Section
-		
-		if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
-			drive.SetMaxSpeed(controllerDrive);
-		}
-		
 		
 		// Drive Section
 		
@@ -188,7 +179,6 @@ public class Robot extends IterativeRobot {
 		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
 		double rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
 		
-		System.out.println(horizontal + " " + vertical + " " + rotation);
 		drive.Update(horizontal, vertical, rotation);
 	}
 	
