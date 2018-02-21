@@ -1,10 +1,10 @@
 package org.usfirst.frc.team815.robot;
 
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Gyro {
-	AnalogGyro gyro;
+	ADXRS450_Gyro gyro;
 	double rotationCompensation;
 	double targetAngle = 0;
 	double playerAngle = 0;
@@ -13,7 +13,7 @@ public class Gyro {
 	boolean timerRunning = false;
 	
 	public Gyro(int port) {
-		gyro = new AnalogGyro(port);
+		gyro = new ADXRS450_Gyro();
 		gyro.calibrate();
 	}
 	

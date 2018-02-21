@@ -1,49 +1,23 @@
 package org.usfirst.frc.team815.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-public class Autonomous {
+public abstract class Autonomous {
 	
 	String GameLayout = DriverStation.getInstance().getGameSpecificMessage();
 	
-	private Timer timer = new Timer();
-	//private Timer boostTimer = new Timer();
-	private double horizontal, vertical;
+	protected double horizontal, vertical, rotation;
+	Gyro gyro;
 	
-	public Autonomous() {
+	public Autonomous(Gyro gyroIn) {
+		gyro = gyroIn;
+		horizontal = vertical = rotation = 0;
 	}
 	
-	public void StartAuto() {
-		horizontal = 0;
-		vertical = 0;
-		timer.start();
-		//boostTimer.start();
-	}
-	
-	public void Update() {
-		CrossAutoLine();
-	}
-	
-	// Get across the auto line
-	public void CrossAutoLine() {
-		if(timer.get() >= 5) {
-			vertical = 0;
-		} else {
-			// Accelerate to target speed
-			vertical = 0.2 * Math.min(1, timer.get());
-		}
-	}
-	
-	// Score on switch
-	public void ScoreOnSwitch() {
+	public abstract void StartAuto();
 		
-	}
-	
-	// Score on scale
-	public void ScoreOnScale() {
-		
-	}
+	public abstract void Update();
 	
 	public double GetHorizontal() {
 		return horizontal;
@@ -51,5 +25,9 @@ public class Autonomous {
 	
 	public double GetVertical() {
 		return vertical;
+	}
+	
+	public double GetRotation() {
+		return rotation;
 	}
 }
