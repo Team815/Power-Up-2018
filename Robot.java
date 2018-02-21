@@ -18,11 +18,13 @@ import edu.wpi.first.wpilibj.Relay;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
+	Controller controllerClaw;
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto = new Autonomous();
+	Claw claw = new Claw();
 	Elevator elevator = new Elevator(5,6);
 	Tilt tilt = new Tilt();
 	
@@ -55,6 +57,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		
+		controllerClaw = controller0;
 		controllerDrive = controller0;
 		controllerElevator = controller0;
 		controllerTilt = controller0;
@@ -77,6 +80,32 @@ public class Robot extends IterativeRobot {
 		    	controllerElevator = controller0;
 			}
 		}
+		
+//		Claw Section
+		
+			if(controllerClaw.WasClicked(ButtonName.X)) {
+				if(claw.getOpen()) {
+					claw.closeClaw();
+				}
+				else if(!claw.getOpen()) {
+					claw.openClaw();
+				}
+			}
+			else if(claw.timer.get() > Claw.CLAW_MOVEMENT_TIME)
+				claw.stopClaw();
+			
+			if(controllerClaw.IsPressed(ButtonName.RB)) {
+				claw.rollBackwards();
+			}
+			else if(controllerClaw.WasReleased(ButtonName.RB)) {
+				claw.stopRolling();
+			}
+			if(controllerClaw.IsPressed(ButtonName.LB)) {
+				claw.rollForwards();
+			}
+			else if(controllerClaw.WasReleased(ButtonName.LB)) {
+				claw.stopRolling();
+			}
 		
 		// Tilt Section
 		
