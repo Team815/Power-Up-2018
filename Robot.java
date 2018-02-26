@@ -47,6 +47,9 @@ public class Robot extends IterativeRobot {
 		case 1:
 			auto = new AutoCrossLine(drive.getGyro());
 			break;
+		case 2: 
+			auto = new AutoScoreSwitch(drive.getGyro());
+			break;
 		default:
 			auto = new AutoTest(drive.getGyro());
 			break;
