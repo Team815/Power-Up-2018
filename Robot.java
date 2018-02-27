@@ -1,13 +1,10 @@
 package org.usfirst.frc.team815.robot;
 
+import org.usfirst.frc.team815.robot.Claw.RollerDirection;
 import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
-import org.usfirst.frc.team815.robot.Dpad.Direction;
 import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
-import org.usfirst.frc.team815.robot.Switchboard.PotName;
-
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Relay;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -18,11 +15,14 @@ import edu.wpi.first.wpilibj.Relay;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
+	Controller controllerClaw;
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
+	Switchboard switchboard = new Switchboard(1);
 	Drive drive = new Drive(4, 7, 10, 3);
-	Autonomous auto = new Autonomous();
+	Autonomous auto;
+	Claw claw = new Claw();
 	Elevator elevator = new Elevator(5,6);
 	Tilt tilt = new Tilt();
 	
@@ -40,6 +40,24 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		switchboard.Update();
+		int switchBinaryValue = switchboard.GetBinaryValue();
+		
+		switch (switchBinaryValue) {
+		case 1:
+			auto = new AutoCrossLine(drive.getGyro());
+			break;
+		case 2: 
+			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator);
+			break;
+		case 4:
+			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator);
+		default:
+			auto = new AutoTest(drive.getGyro());
+			break;
+		}
+		
+		auto.StartAuto();
 	}
 	
 	/**
@@ -47,6 +65,13 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		auto.Update();
+		
+		double horizontal = auto.GetHorizontal();
+		double vertical = auto.GetVertical();
+		double rotation = auto.GetRotation();
+		
+		drive.Update(horizontal, vertical, rotation);
 	}
 	
 	/**
@@ -55,6 +80,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		
+		controllerClaw = controller0;
 		controllerDrive = controller0;
 		controllerElevator = controller0;
 		controllerTilt = controller0;
@@ -65,7 +91,6 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
 		controller0.Update();
 		//controller1.Update();
 		//switchboard.Update();
@@ -76,6 +101,30 @@ public class Robot extends IterativeRobot {
 			} else {
 		    	controllerElevator = controller0;
 			}
+		}
+		
+		// Claw Section
+		
+		if(controllerClaw.WasClicked(ButtonName.X)) {
+			claw.toggleClaw();
+		}
+		
+		claw.update();
+		
+		// Roller Subsection
+		
+		if(controllerClaw.WasReleased(ButtonName.LB) || controllerClaw.WasReleased(ButtonName.RB)) {
+			if(controllerClaw.IsPressed(ButtonName.LB)) {
+				claw.setRollerDirection(RollerDirection.BACKWARD);
+			} else if(controllerClaw.IsPressed(ButtonName.RB)) {
+				claw.setRollerDirection(RollerDirection.FORWARD);
+			} else {
+				claw.setRollerDirection(RollerDirection.STOPPED);
+			}
+		} else if(controllerClaw.WasClicked(ButtonName.LB)) {
+			claw.setRollerDirection(RollerDirection.BACKWARD);
+		} else if(controllerClaw.WasClicked(ButtonName.RB)) {
+			claw.setRollerDirection(RollerDirection.FORWARD);
 		}
 		
 		// Tilt Section
@@ -125,16 +174,18 @@ public class Robot extends IterativeRobot {
 		
 		elevator.CheckCalibration();
 		
-		// Speed Control Section
-		
-		if(controllerDrive.IsPressed(ButtonName.RB) || controllerDrive.IsPressed(ButtonName.LB)) {
-			drive.SetMaxSpeed(controllerDrive);
-		}
-		
 		
 		// Drive Section
 		
-		drive.Update(controllerDrive);
+		if(controllerDrive.WasClicked(Controller.ButtonName.B)) {
+			drive.ResetPlayerAngle();
+		}
+		
+		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
+		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
+		double rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
+		
+		drive.Update(horizontal, vertical, rotation);
 	}
 	
 	/**

@@ -1,10 +1,10 @@
 package org.usfirst.frc.team815.robot;
 
-import org.usfirst.frc.team815.robot.Controller.AnalogName;
 import org.usfirst.frc.team815.robot.Controller.ButtonName;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
@@ -58,19 +58,18 @@ public class Drive {
 		drive.setMaxOutput(speedMultiplier);
     }
 	
-	public void Update(Controller controller) {
-		double horizontal = controller.GetValue(AnalogName.LeftJoyX);		
-		double vertical = -controller.GetValue(AnalogName.LeftJoyY);
-		double rotation = controller.GetValue(AnalogName.RightJoyX);
+	public void ResetPlayerAngle() {
+		gyro.reset();
+		driveController.setSetpoint(gyro.getAngle());
+	}
+	
+	public void Update(double horizontal, double vertical, double rotation) {
 		
-		if(controller.WasClicked(Controller.ButtonName.B)) {
-			gyro.reset();
-			driveController.setSetpoint(gyro.getAngle());
-		}
-		
-		if(controller.JustActivated(Controller.AnalogName.RightJoyX)) {
+		if(rotation != 0 && driveController.isEnabled()) {
+			timer.stop();
+			timer.reset();
 			driveController.disable();
-		} else if (controller.JustZeroed(Controller.AnalogName.RightJoyX)) {
+		} else if (rotation == 0 && !driveController.isEnabled() && timer.get() == 0) { // TODO: prevent repeated starts
 			timer.start();
 		}
 		
@@ -85,6 +84,10 @@ public class Drive {
 			rotation += rotationCompensation;
 		}
 		
-    	drive.driveCartesian(horizontal, vertical, rotation, -gyro.getAngle());
+		drive.driveCartesian(horizontal, vertical, rotation, -gyro.getAngle());
+	}
+	
+	public Gyro getGyro() {
+		return gyro;
 	}
 }

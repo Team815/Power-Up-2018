@@ -20,7 +20,7 @@ public class Tilt {
 	private DigitalInput rightLimitSwitch;
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
-	private State state;
+	public State state;
 	
 	public enum State {
 		UP,
