@@ -69,8 +69,7 @@ public class Drive {
 			timer.stop();
 			timer.reset();
 			driveController.disable();
-		} else if (rotation == 0 && !driveController.isEnabled()) { // TODO: prevent repeated starts
-			System.out.println("Ouyt");
+		} else if (rotation == 0 && !driveController.isEnabled() && timer.get() == 0) { // TODO: prevent repeated starts
 			timer.start();
 		}
 		
