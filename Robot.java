@@ -48,8 +48,10 @@ public class Robot extends IterativeRobot {
 			auto = new AutoCrossLine(drive.getGyro());
 			break;
 		case 2: 
-			auto = new AutoScoreSwitch(drive.getGyro());
+			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator);
 			break;
+		case 4:
+			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator);
 		default:
 			auto = new AutoTest(drive.getGyro());
 			break;
@@ -64,6 +66,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		auto.Update();
+		
 		double horizontal = auto.GetHorizontal();
 		double vertical = auto.GetVertical();
 		double rotation = auto.GetRotation();

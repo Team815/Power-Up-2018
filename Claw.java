@@ -49,7 +49,7 @@ public class Claw {
 		}
 	}
 	
-	private void openClaw() {
+	public void openClaw() {
 		timer.start();
 		clawMotor.set(-1);
 		open = true;
