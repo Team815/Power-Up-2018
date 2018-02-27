@@ -113,17 +113,17 @@ public class Robot extends IterativeRobot {
 		
 		// Roller Subsection
 		
-		if(controllerClaw.WasReleased(ButtonName.RB) || controllerClaw.WasReleased(ButtonName.LB)) {
-			if(controllerClaw.IsPressed(ButtonName.RB)) {
+		if(controllerClaw.WasReleased(ButtonName.LB) || controllerClaw.WasReleased(ButtonName.RB)) {
+			if(controllerClaw.IsPressed(ButtonName.LB)) {
 				claw.setRollerDirection(RollerDirection.BACKWARD);
-			} else if(controllerClaw.IsPressed(ButtonName.LB)) {
+			} else if(controllerClaw.IsPressed(ButtonName.RB)) {
 				claw.setRollerDirection(RollerDirection.FORWARD);
 			} else {
 				claw.setRollerDirection(RollerDirection.STOPPED);
 			}
-		} else if(controllerClaw.WasClicked(ButtonName.RB)) {
-			claw.setRollerDirection(RollerDirection.BACKWARD);
 		} else if(controllerClaw.WasClicked(ButtonName.LB)) {
+			claw.setRollerDirection(RollerDirection.BACKWARD);
+		} else if(controllerClaw.WasClicked(ButtonName.RB)) {
 			claw.setRollerDirection(RollerDirection.FORWARD);
 		}
 		
