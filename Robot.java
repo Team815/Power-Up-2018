@@ -15,11 +15,12 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
+	Controller controller1 = new Controller(1);
 	Controller controllerClaw;
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
-	Switchboard switchboard = new Switchboard(1);
+	Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto;
 	Claw claw = new Claw();
@@ -82,7 +83,7 @@ public class Robot extends IterativeRobot {
 		
 		controllerClaw = controller0;
 		controllerDrive = controller0;
-		controllerElevator = controller0;
+		controllerElevator = controller1;
 		controllerTilt = controller0;
 	}
 	
@@ -92,16 +93,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		controller0.Update();
-		//controller1.Update();
-		//switchboard.Update();
-		
-		if(controller0.WasClicked(ButtonName.Start)) {
-			if(controller0.IsToggled(ButtonName.Start)) {
-		    	controllerElevator = controller0;
-			} else {
-		    	controllerElevator = controller0;
-			}
-		}
+		controller1.Update();
 		
 		// Claw Section
 		
