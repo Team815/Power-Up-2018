@@ -15,8 +15,8 @@ public class Elevator {
 	private boolean calibrating;
 	
 	private static final int ENCODER_VALUE_NONE = -1;
-	private static final int ENCODER_VALUE_SCALE = 3400;
-	private static final int ENCODER_VALUE_SWITCH = 700;
+	private static final int ENCODER_VALUE_SCALE = 2400;
+	private static final int ENCODER_VALUE_SWITCH = 500;
 	private static final int ENCODER_VALUE_BOTTOM = 0;
 	private static final double P = 0.003;
 	private static final double I = 0.0;
@@ -46,7 +46,7 @@ public class Elevator {
 		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort1));
 		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort2));
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
-		limitSwitch = new DigitalInput(6);
+		limitSwitch = new DigitalInput(9);
 		calibrating = false;
 		EnablePID();
 	}
