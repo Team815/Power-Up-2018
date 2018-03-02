@@ -3,9 +3,6 @@ package org.usfirst.frc.team815.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.usfirst.frc.team815.robot.Autonomous.Action;
-import org.usfirst.frc.team815.robot.Dpad.Direction;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -43,8 +40,7 @@ public abstract class Autonomous {
 	
 	String GameLayout = DriverStation.getInstance().getGameSpecificMessage();
 	
-	protected Timer routineTimer;
-	protected Timer driveTimer;
+	protected Timer timer;
 	protected Claw claw;
 	protected Tilt tilt;
 	protected Elevator elevator;
@@ -54,6 +50,7 @@ public abstract class Autonomous {
 	
 	protected enum Action {
 		TILT_FORWARD,
+		CALIBRATE_ELEVATOR,
 		GRAB_POWERCUBE,
 		SECURE_POWERCUBE,
 		APPROACH_SWITCH,
@@ -64,19 +61,17 @@ public abstract class Autonomous {
 	}
 	
 	Action action;
+	protected SwitchState switchState;
 	
-	public Autonomous(Gyro gyroIn) {
+	public Autonomous(Gyro gyroIn, SwitchState switchStateIn) {
 		gyro = gyroIn;
+		switchState = switchStateIn;
 		horizontal = vertical = rotation = 0;
 	}
 	
 	public abstract void StartAuto();
 		
 	public abstract void Update();
-	
-	protected Action setAction() {
-		return null;
-	}
 	
 	public double GetHorizontal() {
 		return horizontal;

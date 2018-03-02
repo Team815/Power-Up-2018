@@ -48,20 +48,21 @@ public class Robot extends IterativeRobot {
 		case CROSS_LINE_RIGHT:
 		case CROSS_LINE_CENTER:
 		case CROSS_LINE_LEFT:
-			auto = new AutoCrossLine(drive.getGyro());
+			auto = new AutoCrossLine(drive.getGyro(), switchState);
 			break;
 		case SCORE_SWITCH_CENTER:
-			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator);
+			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
 		case SCORE_SCALE_CENTER:
-			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator);
+			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
 		default:
-			auto = new AutoTest(drive.getGyro());
+			auto = new AutoTest(drive.getGyro(), switchState);
 			break;
 		}
 		
 		drive.ResetPlayerAngle();
+		elevator.EnablePID();
 		auto.StartAuto();
 	}
 	
@@ -91,6 +92,7 @@ public class Robot extends IterativeRobot {
 		controllerTilt = controller0;
 		
 		drive.ResetPlayerAngle();
+		elevator.EnablePID();
 	}
 	
 	/**
