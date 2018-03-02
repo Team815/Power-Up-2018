@@ -42,22 +42,26 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		switchboard.Update();
-		int switchBinaryValue = switchboard.GetBinaryValue();
+		Autonomous.SwitchState switchState = Autonomous.SwitchState.get(switchboard.GetBinaryValue());
 		
-		switch (switchBinaryValue) {
-		case 1:
+		switch (switchState) {
+		case CROSS_LINE_RIGHT:
+		case CROSS_LINE_CENTER:
+		case CROSS_LINE_LEFT:
 			auto = new AutoCrossLine(drive.getGyro());
 			break;
-		case 2: 
+		case SCORE_SWITCH_CENTER:
 			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator);
 			break;
-		case 4:
+		case SCORE_SCALE_CENTER:
 			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator);
+			break;
 		default:
 			auto = new AutoTest(drive.getGyro());
 			break;
 		}
 		
+		drive.ResetPlayerAngle();
 		auto.StartAuto();
 	}
 	
@@ -85,6 +89,8 @@ public class Robot extends IterativeRobot {
 		controllerDrive = controller0;
 		controllerElevator = controller1;
 		controllerTilt = controller0;
+		
+		drive.ResetPlayerAngle();
 	}
 	
 	/**

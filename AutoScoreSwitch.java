@@ -86,11 +86,11 @@ public class AutoScoreSwitch extends Autonomous {
 		else if(routineTimer.get() < 8)
 			return Action.TILT_FORWARD;
 		else if(routineTimer.get() < 10)
-		return Action.RAISE_ELEVATOR;
-		else if(routineTimer.get() < 12)
-			return Action.APPROACH_SWITCH;
-		else if(routineTimer.get() < 14)
-			return Action.DROP_POWERCUBE;
+			return Action.RAISE_ELEVATOR;
+//		else if(routineTimer.get() < 12)
+//			return Action.APPROACH_SWITCH;
+//		else if(routineTimer.get() < 14)
+//			return Action.DROP_POWERCUBE;
 		else if(routineTimer.get() >= 14)
 			return Action.STOP;
 		else return Action.STOP;
