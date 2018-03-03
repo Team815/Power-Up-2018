@@ -14,7 +14,7 @@ public class Claw {
 	private Timer timer;
 	
 	public enum RollerDirection {
-		FORWARD(1),
+		FORWARD(.5),
 		BACKWARD(-1),
 		STOPPED(0);
 		

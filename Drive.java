@@ -20,7 +20,7 @@ public class Drive {
 	private double speedMultiplier = 1;
 	private static final double MIN_MULTIPLIER = 0.2;
 	private static final double MAX_MULTIPLIER = 1;
-	private static final double MULTIPLIER_INCREMENT = 0.01;
+	private static final double MULTIPLIER_INCREMENT = 0.1;
 	private static final double P = 0.03;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
@@ -49,9 +49,9 @@ public class Drive {
 	}
 	
 	public void SetMaxSpeed(Controller controller) {
-    	if(controller.IsPressed(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
+    	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
     		speedMultiplier -= MULTIPLIER_INCREMENT;
-    	} else if (controller.IsPressed(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
+    	} else if (controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
     		speedMultiplier += MULTIPLIER_INCREMENT;
     	}
     	

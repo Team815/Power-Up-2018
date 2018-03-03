@@ -94,4 +94,8 @@ public class Tilt {
 			state = State.DOWN;
 		}
 	}
+	
+	public void Set(double valueIn) {
+		motors.SetSpeed(valueIn);
+	}
 }

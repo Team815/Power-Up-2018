@@ -50,7 +50,9 @@ public class Robot extends IterativeRobot {
 		case CROSS_LINE_LEFT:
 			auto = new AutoCrossLine(drive.getGyro(), switchState);
 			break;
+		case SCORE_SWITCH_RIGHT:
 		case SCORE_SWITCH_CENTER:
+		case SCORE_SWITCH_LEFT:
 			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
 		case SCORE_SCALE_CENTER:
@@ -180,6 +182,8 @@ public class Robot extends IterativeRobot {
 		if(controllerDrive.WasClicked(Controller.ButtonName.B)) {
 			drive.ResetPlayerAngle();
 		}
+		
+		drive.SetMaxSpeed(controller1);
 		
 		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
 		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);
