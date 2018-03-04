@@ -23,10 +23,10 @@ public class AutoScoreSwitch extends Autonomous {
 		}
 	}
 	
-	private static final Movement STRAIGHT = new Movement(0.5, 00.0, 00.0, 2.0);
-	private static final Movement CLOSE    = new Movement(0.5, 00.0, 00.0, 2.0);
-	private static final Movement FAR      = new Movement(0.5, 90.0, 00.0, 5.0);
-	private static final double H_FACTOR = 1.3;
+	private static final Movement STRAIGHT = new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement CLOSE    = new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement FAR      = new Movement(0.25, 90.0, 00.0, 5.0);
+	private static final double H_FACTOR = 2.8;
 	
 	private Timer timer;
 	private double speed;
@@ -104,7 +104,7 @@ public class AutoScoreSwitch extends Autonomous {
 			return true;
 		} else {
 			angle = (angleEnd - angleStart) * (timer.get() / timeout) + angleStart;
-			if(switchState == SwitchState.CROSS_LINE_RIGHT) {
+			if(switchState == SwitchState.SCORE_SWITCH_RIGHT) {
 				angle *= -1;
 			}
 			horizontal = H_FACTOR * speed * Math.sin(Math.toRadians(angle));
