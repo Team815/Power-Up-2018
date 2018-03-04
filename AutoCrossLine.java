@@ -5,30 +5,9 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoCrossLine extends Autonomous {
 	
-	private static class Movement {
-		public final double SPEED;
-		public final double ANGLE_START;
-		public final double ANGLE_END;
-		public final double TIMEOUT;
-		
-		public Movement(double speedIn, double angleStartIn, double angleEndIn, double timeoutIn) {
-			SPEED = speedIn;
-			ANGLE_START = angleStartIn;
-			ANGLE_END = angleEndIn;
-			TIMEOUT = timeoutIn;
-		}
-	}
-	
 	private static final Movement STRAIGHT = new Movement(0.5, 00.0, 00.0, 2.0);
 	private static final Movement CLOSE    = new Movement(0.5, 00.0, 00.0, 2.0);
 	private static final Movement FAR      = new Movement(0.5, 90.0, 00.0, 5.0);
-	
-	private Timer timer;
-	private double speed;
-	private double angleStart;
-	private double angleEnd;
-	private double angle;
-	private double timeout;
 	
 	public AutoCrossLine(Gyro gyroIn, SwitchState switchStateIn) {
 		super(gyroIn, switchStateIn);

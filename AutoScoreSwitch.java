@@ -1,41 +1,17 @@
 package org.usfirst.frc.team815.robot;
 
-import org.usfirst.frc.team815.robot.Autonomous.SwitchState;
 import org.usfirst.frc.team815.robot.Claw.RollerDirection;
-import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Tilt.State;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreSwitch extends Autonomous {
-	private static class Movement {
-		public final double SPEED;
-		public final double ANGLE_START;
-		public final double ANGLE_END;
-		public final double TIMEOUT;
-		
-		public Movement(double speedIn, double angleStartIn, double angleEndIn, double timeoutIn) {
-			SPEED = speedIn;
-			ANGLE_START = angleStartIn;
-			ANGLE_END = angleEndIn;
-			TIMEOUT = timeoutIn;
-		}
-	}
 	
 	private static final Movement STRAIGHT = new Movement(0.28, 00.0, 00.0, 3.0);
 	private static final Movement CLOSE    = new Movement(0.28, 00.0, 00.0, 3.0);
 	private static final Movement FAR      = new Movement(0.25, 90.0, 00.0, 5.0);
 	private static final double H_FACTOR = 2.8;
-	
-	private Timer timer;
-	private double speed;
-	private double angleStart;
-	private double angleEnd;
-	private double angle;
-	private double timeout;
-	
-	private Action nextAction;
 	
 	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
 		super(gyroIn, switchStateIn);
@@ -92,6 +68,9 @@ public class AutoScoreSwitch extends Autonomous {
 			claw.setRollerDirection(RollerDirection.STOPPED);
 			timer.stop();
 			timer.reset();
+			break;
+		default:
+			System.out.println(action);
 			break;
 		}
 	}
