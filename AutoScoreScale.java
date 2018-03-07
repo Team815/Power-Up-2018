@@ -1,6 +1,5 @@
 package org.usfirst.frc.team815.robot;
 
-import org.usfirst.frc.team815.robot.Autonomous.Action;
 import org.usfirst.frc.team815.robot.Claw.RollerDirection;
 import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Tilt.State;
@@ -9,13 +8,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreScale extends Autonomous {
-	private static final double DRIVE_TIME = 3;	// Experiment with this value
-	private static final double ROBOT_SPEED = 0.5;
-	private static final double ROBOT_ANGLE = 72;
+	private static final Movement HALF 	= new Movement(0.5, 00.0, 00.0, 2.5);
+	private static final Movement CLOSE = new Movement(0.5, 00.0, 00.0, 2.5);
+	private static final Movement FAR   = new Movement(0.25, 90.0, 00.0, 5.0);
+	private static final double H_FACTOR = 2.8;
 	
 	public AutoScoreScale(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
 		super(gyroIn, switchStateIn);
-		action = Action.TILT_FORWARD;
 		timer = new Timer();
 		this.claw = claw;
 		this.tilt = tilt;
@@ -24,50 +23,50 @@ public class AutoScoreScale extends Autonomous {
 
 	@Override
 	public void StartAuto() {
+		char target = GameLayout.charAt(1);
+		if(switchState == SwitchState.HALF_SCORE_SCALE_LEFT || switchState == SwitchState.HALF_SCORE_SCALE_RIGHT) {
+			speed = HALF.SPEED;
+			angleStart = HALF.ANGLE_START;
+			angleEnd = HALF.ANGLE_END;
+			timeout = HALF.TIMEOUT;
+		} else
+			if(switchState == SwitchState.SCORE_SCALE_RIGHT && target == 'R'
+		       || switchState == SwitchState.SCORE_SCALE_LEFT  && target == 'L') {
+			speed = CLOSE.SPEED;
+			angleStart = CLOSE.ANGLE_START;
+			angleEnd = CLOSE.ANGLE_END;
+			timeout = CLOSE.TIMEOUT;
+		} else {
+			speed = FAR.SPEED;
+			angleStart = FAR.ANGLE_START;
+			angleEnd = FAR.ANGLE_END;
+			timeout = FAR.TIMEOUT;
+		}
+		action = Action.APPROACH_SCALE;
+		rotation = 0;
+		tilt.StartTilting();
+		timer.start();
 	}
 
 	@Override
 	public void Update() {
 		switch (action) {
-		case TILT_FORWARD:
-			if(tilt.state == State.DOWN)
-				tilt.StartTilting();
-			tilt.Update();
-			if(tilt.state == State.UP) {
-				elevator.Calibrate();
-				action = Action.CALIBRATE_ELEVATOR;
-			}
-			break;
-		case CALIBRATE_ELEVATOR:
-			elevator.CheckCalibration();
-			if(!elevator.isCalibrating()) {
-				elevator.SetPresetTarget(PresetTarget.SWITCH);
-				double robot_horizontal_speed = ROBOT_SPEED * Math.cos(ROBOT_ANGLE);
-				if(GameLayout.charAt(0) == 'L') {
-					robot_horizontal_speed *= -1;
-				}
-				horizontal = robot_horizontal_speed;
-				vertical = ROBOT_SPEED * Math.sin(ROBOT_ANGLE);
-				rotation = 0;
-				timer.start();
-				action = Action.APPROACH_SWITCH;
-			}
-			break;
-		case APPROACH_SWITCH:
-			System.out.println(timer.get());
-			if(timer.hasPeriodPassed(DRIVE_TIME)) {
-				horizontal = 0;
-				vertical = 0;
-				rotation = 0;
-				claw.setRollerDirection(RollerDirection.FORWARD);
+		case APPROACH_SCALE:
+			boolean isStraight = IsStraight();
+			boolean atScale = AtSwitch();
+			if(isStraight && atScale) {
+				elevator.SetPresetTarget(PresetTarget.SCALE);
+				action = Action.RAISE_ELEVATOR;
 				timer.reset();
-				action = Action.DROP_POWERCUBE;
 			}
 			break;
 		case RAISE_ELEVATOR:
+			if(elevator.getEncoderValue() >= Elevator.ENCODER_VALUE_SCALE) {
+				action = Action.DROP_POWERCUBE;
+			}
 			break;
 		case DROP_POWERCUBE:
-			if(timer.hasPeriodPassed(0.5)) {
+			if(timer.get() >= 1) {
 				action = Action.STOP;
 			}
 			break;
@@ -76,6 +75,35 @@ public class AutoScoreScale extends Autonomous {
 			timer.stop();
 			timer.reset();
 			break;
+		default:
+			System.out.println(action);
+			break;
+		}
+	}
+	
+	public boolean AtSwitch() {
+		if(timer.get() >= timeout) {
+			horizontal = 0;
+			vertical = 0;
+			rotation = 0;
+			return true;
+		} else {
+			angle = (angleEnd - angleStart) * (timer.get() / timeout) + angleStart;
+			if(switchState == SwitchState.SCORE_SCALE_RIGHT) {
+				angle *= -1;
+			}
+			horizontal = H_FACTOR * speed * Math.sin(Math.toRadians(angle));
+			vertical = speed * Math.cos(Math.toRadians(angle));
+			return false;
+		}
+	}
+	
+	public boolean IsStraight() {
+		tilt.Update();
+		if(tilt.state == State.UP) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

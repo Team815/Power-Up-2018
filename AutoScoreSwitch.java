@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreSwitch extends Autonomous {
 	
-	private static final Movement STRAIGHT = new Movement(0.28, 00.0, 00.0, 3.0);
-	private static final Movement CLOSE    = new Movement(0.28, 00.0, 00.0, 3.0);
-	private static final Movement FAR      = new Movement(0.25, 90.0, 00.0, 5.0);
+	private static final Movement HALF 	= new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement CLOSE = new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement FAR   = new Movement(0.25, 90.0, 00.0, 5.0);
 	private static final double H_FACTOR = 2.8;
 	
 	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
@@ -24,12 +24,13 @@ public class AutoScoreSwitch extends Autonomous {
 	@Override
 	public void StartAuto() {
 		char target = GameLayout.charAt(0);
-		if(switchState == SwitchState.SCORE_SWITCH_CENTER) {
-			speed = STRAIGHT.SPEED;
-			angleStart = STRAIGHT.ANGLE_START;
-			angleEnd = STRAIGHT.ANGLE_END;
-			timeout = STRAIGHT.TIMEOUT;
-		} else if(switchState == SwitchState.SCORE_SWITCH_RIGHT && target == 'R'
+		if(switchState == SwitchState.HALF_SCORE_SWITCH_LEFT || switchState == SwitchState.HALF_SCORE_SWITCH_RIGHT) {
+			speed = HALF.SPEED;
+			angleStart = HALF.ANGLE_START;
+			angleEnd = HALF.ANGLE_END;
+			timeout = HALF.TIMEOUT;
+		} else 
+			if(switchState == SwitchState.SCORE_SWITCH_RIGHT && target == 'R'
 		       || switchState == SwitchState.SCORE_SWITCH_LEFT  && target == 'L') {
 			speed = CLOSE.SPEED;
 			angleStart = CLOSE.ANGLE_START;
