@@ -96,4 +96,8 @@ public class Elevator {
 	public boolean isCalibrating() {
 		return calibrating;
 	}
+	
+	public int getEncoderValue() {
+		return encoder.get();
+	}
 }

@@ -183,7 +183,9 @@ public class Robot extends IterativeRobot {
 			drive.ResetPlayerAngle();
 		}
 		
-		drive.SetMaxSpeed(controller1);
+		drive.ManualSetMaxSpeed(controller1);
+		
+		drive.AutoSetMaxSpeed(elevator.getEncoderValue());
 		
 		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
 		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);

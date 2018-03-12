@@ -21,6 +21,9 @@ public class Drive {
 	private static final double MIN_MULTIPLIER = 0.2;
 	private static final double MAX_MULTIPLIER = 1;
 	private static final double MULTIPLIER_INCREMENT = 0.1;
+	private static final double AUTO_MAX_SPEED_ACTIVATION_THRESHOLD = .5;
+	private static final double MAX_ELEVATOR_HEIGHT = 2400;
+	private static final double SPEED_CONTROL_RANGE_PERCENTAGE = .5;
 	private static final double P = 0.03;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
@@ -48,7 +51,7 @@ public class Drive {
     	driveController.enable();
 	}
 	
-	public void SetMaxSpeed(Controller controller) {
+	public void ManualSetMaxSpeed(Controller controller) {
     	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
     		speedMultiplier -= MULTIPLIER_INCREMENT;
     	} else if (controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
@@ -57,6 +60,19 @@ public class Drive {
     	
 		drive.setMaxOutput(speedMultiplier);
     }
+	
+	public void AutoSetMaxSpeed(int encoderValue) {
+		if(encoderValue > 1200)
+			speedMultiplier = 1-(
+									(encoderValue-
+											(MAX_ELEVATOR_HEIGHT*AUTO_MAX_SPEED_ACTIVATION_THRESHOLD)
+									)/
+									(SPEED_CONTROL_RANGE_PERCENTAGE*
+											(MAX_ELEVATOR_HEIGHT/AUTO_MAX_SPEED_ACTIVATION_THRESHOLD))
+									);
+		else speedMultiplier = MAX_MULTIPLIER;
+		drive.setMaxOutput(speedMultiplier);
+	}
 	
 	public void ResetPlayerAngle() {
 		gyro.reset();
