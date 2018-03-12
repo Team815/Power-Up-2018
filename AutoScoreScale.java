@@ -9,13 +9,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreScale extends Autonomous {
-	private static final float DRIVE_TIME_LIMIT = 3;	// Experiment with this value
+	private static final double DRIVE_TIME = 3;	// Experiment with this value
+	private static final double ROBOT_SPEED = 0.5;
+	private static final double ROBOT_ANGLE = 72;
 	
-	public AutoScoreScale(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator) {
-		super(gyroIn);
+	public AutoScoreScale(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
+		super(gyroIn, switchStateIn);
 		action = Action.TILT_FORWARD;
-		routineTimer = new Timer();
-		driveTimer = new Timer();
+		timer = new Timer();
 		this.claw = claw;
 		this.tilt = tilt;
 		this.elevator = elevator;
@@ -23,69 +24,58 @@ public class AutoScoreScale extends Autonomous {
 
 	@Override
 	public void StartAuto() {
-		routineTimer.start();
 	}
 
 	@Override
 	public void Update() {
-		if (routineTimer.get() > 0) {
-			action = setAction();
-			
-			switch (action) {
-			case TILT_FORWARD:
-				if(tilt.state == State.DOWN)
-					tilt.StartTilting();
-				tilt.Update();
-				break;
-			case APPROACH_SCALE:
-				if(driveTimer.get() == 0)
-					driveTimer.start();
-				else {
-					if(driveTimer.get() > DRIVE_TIME_LIMIT) {
-						horizontal = 0;	
-						vertical = 0;
-						rotation = 0;
-						driveTimer.start();
-						driveTimer.reset();
-					}
-					else {
-						horizontal = 0;	
-						vertical = 1;
-						rotation = 0;
-					}
-				}
-				break;
-			case RAISE_ELEVATOR:
-				elevator.SetPresetTarget(PresetTarget.SCALE);
-				break;
-			case DROP_POWERCUBE:
-				claw.setRollerDirection(RollerDirection.FORWARD);
-				break;
-			case STOP:
-				claw.setRollerDirection(RollerDirection.STOPPED);
-				routineTimer.stop();
-				routineTimer.reset();
-				driveTimer.stop();
-				driveTimer.reset();
-				break;
+		switch (action) {
+		case TILT_FORWARD:
+			if(tilt.state == State.DOWN)
+				tilt.StartTilting();
+			tilt.Update();
+			if(tilt.state == State.UP) {
+				elevator.Calibrate();
+				action = Action.CALIBRATE_ELEVATOR;
 			}
+			break;
+		case CALIBRATE_ELEVATOR:
+			elevator.CheckCalibration();
+			if(!elevator.isCalibrating()) {
+				elevator.SetPresetTarget(PresetTarget.SWITCH);
+				double robot_horizontal_speed = ROBOT_SPEED * Math.cos(ROBOT_ANGLE);
+				if(GameLayout.charAt(0) == 'L') {
+					robot_horizontal_speed *= -1;
+				}
+				horizontal = robot_horizontal_speed;
+				vertical = ROBOT_SPEED * Math.sin(ROBOT_ANGLE);
+				rotation = 0;
+				timer.start();
+				action = Action.APPROACH_SWITCH;
+			}
+			break;
+		case APPROACH_SWITCH:
+			System.out.println(timer.get());
+			if(timer.hasPeriodPassed(DRIVE_TIME)) {
+				horizontal = 0;
+				vertical = 0;
+				rotation = 0;
+				claw.setRollerDirection(RollerDirection.FORWARD);
+				timer.reset();
+				action = Action.DROP_POWERCUBE;
+			}
+			break;
+		case RAISE_ELEVATOR:
+			break;
+		case DROP_POWERCUBE:
+			if(timer.hasPeriodPassed(0.5)) {
+				action = Action.STOP;
+			}
+			break;
+		case STOP:
+			claw.setRollerDirection(RollerDirection.STOPPED);
+			timer.stop();
+			timer.reset();
+			break;
 		}
-		
 	}
-	
-	@Override
-	protected Action setAction() {		// Need to combine actions after testing to get under 15 seconds
-		if(routineTimer.get() < 8)
-			return Action.TILT_FORWARD;
-//		else if(routineTimer.get() < 11)
-//			return Action.RAISE_ELEVATOR;
-//		else if(routineTimer.get() < 15)
-//			return Action.APPROACH_SCALE;
-//		else if(routineTimer.get() < 17)
-//			return Action.DROP_POWERCUBE;
-//		else if(routineTimer.get() >= 17 || routineTimer.get() == 0)
-//			return Action.STOP;
-		else return Action.STOP;
-	}
-
 }

@@ -21,6 +21,7 @@ public class Tilt {
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	public State state;
+	private boolean hitLimitSwitch;
 	
 	public enum State {
 		UP,
@@ -41,19 +42,22 @@ public class Tilt {
 		rightEncoder = new Encoder(RIGHT_ENCODER_PORT_A, RIGHT_ENCODER_PORT_B);
 		leftTiltMotor.setInverted(true);
 		state = State.DOWN;
+		hitLimitSwitch = leftLimitSwitch.get() || rightLimitSwitch.get();
 	}
 	
 	public void StartTilting() {
 		switch(state) {
+		case DOWN:
+		case MOVING_DOWN:
+			if(hitLimitSwitch) {
+				motors.SetSpeed(-1);
+				state = State.MOVING_UP;
+				break;
+			} // else do what UP and MOVING_UP do (i.e. move down)
 		case UP:
 		case MOVING_UP:
 			motors.SetSpeed(1);
 			state = State.MOVING_DOWN;
-			break;
-		case DOWN:
-		case MOVING_DOWN:
-			motors.SetSpeed(-1);
-			state = State.MOVING_UP;
 			break;
 		}
 	}
@@ -67,6 +71,7 @@ public class Tilt {
 			break;
 		case MOVING_DOWN:
 			if(leftLimitSwitch.get() || rightLimitSwitch.get()) {
+				hitLimitSwitch = true;
 				StopTilting();
 			}
 			break;
@@ -88,5 +93,9 @@ public class Tilt {
 			rightEncoder.reset();
 			state = State.DOWN;
 		}
+	}
+	
+	public void Set(double valueIn) {
+		motors.SetSpeed(valueIn);
 	}
 }

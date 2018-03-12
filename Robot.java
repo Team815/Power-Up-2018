@@ -15,11 +15,12 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  */
 public class Robot extends IterativeRobot {
 	Controller controller0 = new Controller(0);
+	Controller controller1 = new Controller(1);
 	Controller controllerClaw;
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
-	Switchboard switchboard = new Switchboard(1);
+	Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto;
 	Claw claw = new Claw();
@@ -41,22 +42,29 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousInit() {
 		switchboard.Update();
-		int switchBinaryValue = switchboard.GetBinaryValue();
+		Autonomous.SwitchState switchState = Autonomous.SwitchState.get(switchboard.GetBinaryValue());
 		
-		switch (switchBinaryValue) {
-		case 1:
-			auto = new AutoCrossLine(drive.getGyro());
+		switch (switchState) {
+		case CROSS_LINE_RIGHT:
+		case CROSS_LINE_CENTER:
+		case CROSS_LINE_LEFT:
+			auto = new AutoCrossLine(drive.getGyro(), switchState);
 			break;
-		case 2: 
-			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator);
+		case SCORE_SWITCH_RIGHT:
+		case SCORE_SWITCH_CENTER:
+		case SCORE_SWITCH_LEFT:
+			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
-		case 4:
-			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator);
+		case SCORE_SCALE_CENTER:
+			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator, switchState);
+			break;
 		default:
-			auto = new AutoTest(drive.getGyro());
+			auto = new AutoTest(drive.getGyro(), switchState);
 			break;
 		}
 		
+		drive.ResetPlayerAngle();
+		elevator.EnablePID();
 		auto.StartAuto();
 	}
 	
@@ -82,8 +90,11 @@ public class Robot extends IterativeRobot {
 		
 		controllerClaw = controller0;
 		controllerDrive = controller0;
-		controllerElevator = controller0;
+		controllerElevator = controller1;
 		controllerTilt = controller0;
+		
+		drive.ResetPlayerAngle();
+		elevator.EnablePID();
 	}
 	
 	/**
@@ -92,16 +103,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		controller0.Update();
-		//controller1.Update();
-		//switchboard.Update();
-		
-		if(controller0.WasClicked(ButtonName.Start)) {
-			if(controller0.IsToggled(ButtonName.Start)) {
-		    	controllerElevator = controller0;
-			} else {
-		    	controllerElevator = controller0;
-			}
-		}
+		controller1.Update();
 		
 		// Claw Section
 		
@@ -180,6 +182,8 @@ public class Robot extends IterativeRobot {
 		if(controllerDrive.WasClicked(Controller.ButtonName.B)) {
 			drive.ResetPlayerAngle();
 		}
+		
+		drive.SetMaxSpeed(controller1);
 		
 		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
 		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);

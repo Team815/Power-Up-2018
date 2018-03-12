@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoTest extends Autonomous {
 
-	public AutoTest(Gyro gyroIn) {
-		super(gyroIn);
+	public AutoTest(Gyro gyroIn, SwitchState switchStateIn) {
+		super(gyroIn, switchStateIn);
 	}
 
 	@Override

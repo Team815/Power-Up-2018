@@ -5,26 +5,52 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoCrossLine extends Autonomous {
 	
-	private static final double TIMER_TIMEOUT = 3;
-	private static final double ROBOT_SPEED = 0.5;
-	private Timer timer;
+	private static final Movement STRAIGHT = new Movement(0.5, 00.0, 00.0, 2.0);
+	private static final Movement CLOSE    = new Movement(0.5, 00.0, 00.0, 2.0);
+	private static final Movement FAR      = new Movement(0.5, 90.0, 00.0, 5.0);
 	
-	public AutoCrossLine(Gyro gyroIn) {
-		super(gyroIn);
+	public AutoCrossLine(Gyro gyroIn, SwitchState switchStateIn) {
+		super(gyroIn, switchStateIn);
 		timer = new Timer();
 	}
 
 	@Override
 	public void StartAuto() {
-		timer.reset();
+		char target = GameLayout.charAt(0);
+		if(switchState == SwitchState.CROSS_LINE_CENTER) {
+			speed = STRAIGHT.SPEED;
+			angleStart = STRAIGHT.ANGLE_START;
+			angleEnd = STRAIGHT.ANGLE_END;
+			timeout = STRAIGHT.TIMEOUT;
+		} else if(switchState == SwitchState.CROSS_LINE_RIGHT && target == 'R'
+		       || switchState == SwitchState.CROSS_LINE_LEFT  && target == 'L') {
+			speed = CLOSE.SPEED;
+			angleStart = CLOSE.ANGLE_START;
+			angleEnd = CLOSE.ANGLE_END;
+			timeout = CLOSE.TIMEOUT;
+		} else {
+			speed = FAR.SPEED;
+			angleStart = FAR.ANGLE_START;
+			angleEnd = FAR.ANGLE_END;
+			timeout = FAR.TIMEOUT;
+		}
+		rotation = 0;
 		timer.start();
 	}
 
 	@Override
 	public void Update() {
-		horizontal = 0;
-		vertical = timer.get() > TIMER_TIMEOUT ? 0 : ROBOT_SPEED;
-		rotation = 0;
+		if(timer.get() >= timeout) {
+			horizontal = 0;
+			vertical = 0;
+			rotation = 0;
+		} else {
+			angle = (angleEnd - angleStart) * (timer.get() / timeout) + angleStart;
+			if(switchState == SwitchState.CROSS_LINE_RIGHT) {
+				angle *= -1;
+			}
+			horizontal = 1.3 * speed * Math.sin(Math.toRadians(angle));
+			vertical = speed * Math.cos(Math.toRadians(angle));
+		}
 	}
-
 }

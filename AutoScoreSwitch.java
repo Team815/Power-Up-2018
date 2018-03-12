@@ -1,21 +1,21 @@
 package org.usfirst.frc.team815.robot;
 
 import org.usfirst.frc.team815.robot.Claw.RollerDirection;
-import org.usfirst.frc.team815.robot.Controller.AnalogName;
-import org.usfirst.frc.team815.robot.Elevator.PresetTarget;
 import org.usfirst.frc.team815.robot.Tilt.State;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreSwitch extends Autonomous {
-	private static final float DRIVE_TIME_LIMIT = 2;	// Experiment with this value
 	
-	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator) {
-		super(gyroIn);
-		action = Action.TILT_FORWARD;
-		routineTimer = new Timer();
-		driveTimer = new Timer();
+	private static final Movement STRAIGHT = new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement CLOSE    = new Movement(0.28, 00.0, 00.0, 3.0);
+	private static final Movement FAR      = new Movement(0.25, 90.0, 00.0, 5.0);
+	private static final double H_FACTOR = 2.8;
+	
+	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
+		super(gyroIn, switchStateIn);
+		timer = new Timer();
 		this.claw = claw;
 		this.tilt = tilt;
 		this.elevator = elevator;
@@ -23,69 +23,81 @@ public class AutoScoreSwitch extends Autonomous {
 
 	@Override
 	public void StartAuto() {
-		//claw.openClaw();
-		routineTimer.start();
+		char target = GameLayout.charAt(0);
+		if(switchState == SwitchState.SCORE_SWITCH_CENTER) {
+			speed = STRAIGHT.SPEED;
+			angleStart = STRAIGHT.ANGLE_START;
+			angleEnd = STRAIGHT.ANGLE_END;
+			timeout = STRAIGHT.TIMEOUT;
+		} else if(switchState == SwitchState.SCORE_SWITCH_RIGHT && target == 'R'
+		       || switchState == SwitchState.SCORE_SWITCH_LEFT  && target == 'L') {
+			speed = CLOSE.SPEED;
+			angleStart = CLOSE.ANGLE_START;
+			angleEnd = CLOSE.ANGLE_END;
+			timeout = CLOSE.TIMEOUT;
+		} else {
+			speed = FAR.SPEED;
+			angleStart = FAR.ANGLE_START;
+			angleEnd = FAR.ANGLE_END;
+			timeout = FAR.TIMEOUT;
+		}
+		action = Action.APPROACH_SWITCH;
+		rotation = 0;
+		tilt.StartTilting();
+		timer.start();
 	}
 
 	@Override
 	public void Update() {
-		if (routineTimer.get() > 0) {
-			action = setAction();
-			
-			switch (action) {
-			case TILT_FORWARD:
-				if(tilt.state == State.DOWN)
-					tilt.StartTilting();
-				tilt.Update();
-				break;
-			case APPROACH_SWITCH:
-				if(driveTimer.get() == 0)
-					driveTimer.start();
-				else {
-					if(driveTimer.get() > DRIVE_TIME_LIMIT) {
-						horizontal = 0;	
-						vertical = 0;
-						rotation = 0;
-						driveTimer.start();
-						driveTimer.reset();
-					}
-					else {
-						horizontal = 0;	
-						vertical = 1;
-						rotation = 0;
-					}
-				}
-				break;
-			case RAISE_ELEVATOR:
-				elevator.SetPresetTarget(PresetTarget.SWITCH);
-				break;
-			case DROP_POWERCUBE:
+		switch (action) {
+		case APPROACH_SWITCH:
+			boolean isStraight = IsStraight();
+			boolean atSwitch = AtSwitch();
+			if(isStraight && atSwitch) {
 				claw.setRollerDirection(RollerDirection.FORWARD);
-				break;
-			case STOP:
-				claw.setRollerDirection(RollerDirection.STOPPED);
-				routineTimer.stop();
-				routineTimer.reset();
-				driveTimer.stop();
-				driveTimer.reset();
-				break;
+				action = Action.DROP_POWERCUBE;
+				timer.reset();
 			}
+			break;
+		case DROP_POWERCUBE:
+			if(timer.get() >= 1) {
+				action = Action.STOP;
+			}
+			break;
+		case STOP:
+			claw.setRollerDirection(RollerDirection.STOPPED);
+			timer.stop();
+			timer.reset();
+			break;
+		default:
+			System.out.println(action);
+			break;
 		}
 	}
-
-	@Override
-	protected Action setAction() {		// Need to combine actions after testing to get under 15 seconds
-		if(routineTimer.get() < 8)
-			return Action.TILT_FORWARD;
-//		else if(routineTimer.get() < 10)
-//		return Action.RAISE_ELEVATOR;
-//		else if(routineTimer.get() < 12)
-//			return Action.APPROACH_SWITCH;
-//		else if(routineTimer.get() < 14)
-//			return Action.DROP_POWERCUBE;
-		else if(routineTimer.get() >= 14 || routineTimer.get() == 0)
-			return Action.STOP;
-		else return Action.STOP;
+	
+	public boolean AtSwitch() {
+		if(timer.get() >= timeout) {
+			horizontal = 0;
+			vertical = 0;
+			rotation = 0;
+			return true;
+		} else {
+			angle = (angleEnd - angleStart) * (timer.get() / timeout) + angleStart;
+			if(switchState == SwitchState.SCORE_SWITCH_RIGHT) {
+				angle *= -1;
+			}
+			horizontal = H_FACTOR * speed * Math.sin(Math.toRadians(angle));
+			vertical = speed * Math.cos(Math.toRadians(angle));
+			return false;
+		}
 	}
-
+	
+	public boolean IsStraight() {
+		tilt.Update();
+		if(tilt.state == State.UP) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

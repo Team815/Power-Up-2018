@@ -13,10 +13,11 @@ public class Elevator {
 	private PIDController elevatorController;
 	private DigitalInput limitSwitch;
 	private boolean calibrating;
+	private boolean foundBottom;
 	
 	private static final int ENCODER_VALUE_NONE = -1;
-	private static final int ENCODER_VALUE_SCALE = 3400;
-	private static final int ENCODER_VALUE_SWITCH = 700;
+	private static final int ENCODER_VALUE_SCALE = 2400;
+	private static final int ENCODER_VALUE_SWITCH = 600;
 	private static final int ENCODER_VALUE_BOTTOM = 0;
 	private static final double P = 0.003;
 	private static final double I = 0.0;
@@ -46,13 +47,16 @@ public class Elevator {
 		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort1));
 		elevatorMotors.AddMotor(new WPI_VictorSPX(motorPort2));
 		elevatorController = new PIDController(P, I, D, encoder, elevatorMotors);
-		limitSwitch = new DigitalInput(6);
+		limitSwitch = new DigitalInput(9);
 		calibrating = false;
+		foundBottom = false;
 		EnablePID();
 	}
 	
 	public void SetPresetTarget(PresetTarget presetTargetIn) {
-		elevatorController.setSetpoint(presetTargetIn.getEncoderTarget());
+		if(foundBottom) {
+			elevatorController.setSetpoint(presetTargetIn.getEncoderTarget());
+		}
 	}
 	
 	public void EnablePID() {
@@ -61,7 +65,11 @@ public class Elevator {
 	}
 	
 	public void SetSpeed(double speed) {
-		elevatorMotors.SetSpeed(speed);
+		if ((speed < 0 && limitSwitch.get()) || (speed > 0 && encoder.get() >= ENCODER_VALUE_SCALE)) {
+			elevatorMotors.SetSpeed(0);
+		} else {
+			elevatorMotors.SetSpeed(speed);
+		}
 	}
 	
 	public void InitiateManual() {
@@ -71,6 +79,7 @@ public class Elevator {
 	
 	public void Calibrate() {
 		calibrating = true;
+		foundBottom = false;
 		elevatorController.disable();
 		elevatorMotors.SetSpeed(SPEED_CALIBRATE);
 	}
@@ -78,8 +87,13 @@ public class Elevator {
 	public void CheckCalibration() {
 		if(calibrating && limitSwitch.get()) {
 			calibrating = false;
+			foundBottom = true;
 			encoder.reset();
 			EnablePID();
 		}
+	}
+	
+	public boolean isCalibrating() {
+		return calibrating;
 	}
 }
