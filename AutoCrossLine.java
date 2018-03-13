@@ -14,7 +14,6 @@ public class AutoCrossLine extends Autonomous {
 
 	@Override
 	public void StartAuto() {
-		char target = GameLayout.charAt(0);
 		speed = STRAIGHT.SPEED;
 		angleStart = STRAIGHT.ANGLE_START;
 		angleEnd = STRAIGHT.ANGLE_END;

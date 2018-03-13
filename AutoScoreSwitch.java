@@ -12,6 +12,7 @@ public class AutoScoreSwitch extends Autonomous {
 	private static final Movement CLOSE = new Movement(0.28, 00.0, 00.0, 3.0);
 	private static final Movement FAR   = new Movement(0.25, 90.0, 00.0, 5.0);
 	private static final double H_FACTOR = 2.8;
+	private final char target = GameLayout.charAt(0);
 	
 	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
 		super(gyroIn, switchStateIn);
@@ -19,11 +20,11 @@ public class AutoScoreSwitch extends Autonomous {
 		this.claw = claw;
 		this.tilt = tilt;
 		this.elevator = elevator;
+		this.switchState = switchStateIn;
 	}
 
 	@Override
 	public void StartAuto() {
-		char target = GameLayout.charAt(0);
 		if(switchState == SwitchState.HALF_SCORE_SWITCH_LEFT || switchState == SwitchState.HALF_SCORE_SWITCH_RIGHT) {
 			speed = HALF.SPEED;
 			angleStart = HALF.ANGLE_START;
@@ -55,9 +56,14 @@ public class AutoScoreSwitch extends Autonomous {
 			boolean isStraight = IsStraight();
 			boolean atSwitch = AtSwitch();
 			if(isStraight && atSwitch) {
-				claw.setRollerDirection(RollerDirection.FORWARD);
-				action = Action.DROP_POWERCUBE;
-				timer.reset();
+				if(doScore()) {
+					claw.setRollerDirection(RollerDirection.FORWARD);
+					action = Action.DROP_POWERCUBE;
+					timer.reset();
+				}
+				else {
+					action = Action.STOP;
+				}
 			}
 			break;
 		case DROP_POWERCUBE:
@@ -100,5 +106,29 @@ public class AutoScoreSwitch extends Autonomous {
 		} else {
 			return false;
 		}
+	}
+	
+	private boolean scoreOnNearSide(char target) {
+		switch(switchState) {
+		case HALF_SCORE_SCALE_LEFT:
+		case SCORE_SCALE_LEFT:
+			if(target == 'L')
+				return true;
+			else return false;
+		case HALF_SCORE_SCALE_RIGHT:
+		case SCORE_SCALE_RIGHT:
+			if(target == 'R')
+				return true;
+			else return false;
+		default:
+			return true;
+		}
+	}
+	
+	private boolean doScore() {
+		if((switchState == SwitchState.HALF_SCORE_SCALE_RIGHT || switchState == SwitchState.HALF_SCORE_SCALE_LEFT) 
+			&& !scoreOnNearSide(target))
+			return false;
+		else return true;
 	}
 }

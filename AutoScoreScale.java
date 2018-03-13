@@ -20,6 +20,7 @@ public class AutoScoreScale extends Autonomous {
 		this.claw = claw;
 		this.tilt = tilt;
 		this.elevator = elevator;
+		this.switchState = switchStateIn;
 	}
 
 	@Override
