@@ -20,6 +20,7 @@ public class Robot extends IterativeRobot {
 	Controller controllerElevator;
 	Controller controllerTilt;
 	Controller controllerDrive;
+	Controller controllerSpeed;
 	Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto;
@@ -91,7 +92,8 @@ public class Robot extends IterativeRobot {
 		controllerClaw = controller0;
 		controllerDrive = controller0;
 		controllerElevator = controller1;
-		controllerTilt = controller0;
+		controllerTilt = controller1;
+		controllerSpeed = controller1;
 		
 		drive.ResetPlayerAngle();
 		elevator.EnablePID();
@@ -176,16 +178,19 @@ public class Robot extends IterativeRobot {
 		
 		elevator.CheckCalibration();
 		
+		// Speed Control Section
+		
+		drive.EnableAutoSpeedControl(controllerSpeed.IsToggled(ButtonName.Select));
+		
+		drive.ManualSetMaxSpeed(controllerSpeed);
+		
+		drive.AutoSetMaxSpeed(elevator.getEncoderValue());
 		
 		// Drive Section
 		
 		if(controllerDrive.WasClicked(Controller.ButtonName.B)) {
 			drive.ResetPlayerAngle();
 		}
-		
-		drive.ManualSetMaxSpeed(controller1);
-		
-		drive.AutoSetMaxSpeed(elevator.getEncoderValue());
 		
 		double horizontal = controllerDrive.GetValue(AnalogName.LeftJoyX);		
 		double vertical = -controllerDrive.GetValue(AnalogName.LeftJoyY);

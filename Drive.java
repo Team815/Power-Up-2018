@@ -18,12 +18,13 @@ public class Drive {
 	private Timer timer;
 	private double rotationCompensation;
 	private double speedMultiplier = 1;
+	private boolean autoSpeedControlEnabled;
+	private boolean manualSpeedControlEnabled;
 	private static final double MIN_MULTIPLIER = 0.2;
 	private static final double MAX_MULTIPLIER = 1;
 	private static final double MULTIPLIER_INCREMENT = 0.1;
-	private static final double AUTO_MAX_SPEED_ACTIVATION_THRESHOLD = .5;
-	private static final double MAX_ELEVATOR_HEIGHT = 2400;
-	private static final double SPEED_CONTROL_RANGE_PERCENTAGE = .5;
+	private static final double MIN_AUTO_SPEED_HEIGHT_ENCODER_VALUE = 1200;
+	private static final double MAX_AUTO_SPEED_HEIGHT_ENCODER_VALUE = 2400;
 	private static final double P = 0.03;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
@@ -49,34 +50,51 @@ public class Drive {
     	drive = new MecanumDrive(talonFrontLeft, talonRearLeft, talonFrontRight, talonRearRight);
     	driveController = new PIDController(P, I, D, gyro, driveOutput);
     	driveController.enable();
+    	manualSpeedControlEnabled = true;
+    	autoSpeedControlEnabled = false;
 	}
 	
 	public void ManualSetMaxSpeed(Controller controller) {
-    	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
-    		speedMultiplier -= MULTIPLIER_INCREMENT;
-    	} else if (controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
-    		speedMultiplier += MULTIPLIER_INCREMENT;
-    	}
-    	
-		drive.setMaxOutput(speedMultiplier);
+		if (manualSpeedControlEnabled) {
+	    	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
+	    		speedMultiplier -= MULTIPLIER_INCREMENT;
+	    	} else if (controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
+	    		speedMultiplier += MULTIPLIER_INCREMENT;
+	    	}
+	    	
+			drive.setMaxOutput(speedMultiplier);
+		}
     }
 	
 	public void AutoSetMaxSpeed(int encoderValue) {
-		if(encoderValue > 1200)
-			speedMultiplier = 1-(
-									(encoderValue-
-											(MAX_ELEVATOR_HEIGHT*AUTO_MAX_SPEED_ACTIVATION_THRESHOLD)
-									)/
-									(SPEED_CONTROL_RANGE_PERCENTAGE*
-											(MAX_ELEVATOR_HEIGHT/AUTO_MAX_SPEED_ACTIVATION_THRESHOLD))
-									);
-		else speedMultiplier = MAX_MULTIPLIER;
-		drive.setMaxOutput(speedMultiplier);
+		if(autoSpeedControlEnabled) {
+			if(encoderValue > MIN_AUTO_SPEED_HEIGHT_ENCODER_VALUE)
+				speedMultiplier = MIN_MULTIPLIER + (
+														(encoderValue-MIN_AUTO_SPEED_HEIGHT_ENCODER_VALUE)*
+															(
+																	(MAX_MULTIPLIER-MIN_MULTIPLIER)/(MAX_AUTO_SPEED_HEIGHT_ENCODER_VALUE-MIN_AUTO_SPEED_HEIGHT_ENCODER_VALUE)
+															)
+													);
+			else speedMultiplier = MAX_MULTIPLIER;
+			drive.setMaxOutput(speedMultiplier);
+		}
 	}
 	
 	public void ResetPlayerAngle() {
 		gyro.reset();
 		driveController.setSetpoint(gyro.getAngle());
+	}
+	
+	public void EnableAutoSpeedControl(boolean enable) {
+		if(enable) {
+			autoSpeedControlEnabled = true;
+			manualSpeedControlEnabled = false;
+		}
+		else {
+			autoSpeedControlEnabled = false;
+			manualSpeedControlEnabled = true;
+			drive.setMaxOutput(MAX_MULTIPLIER);
+		}
 	}
 	
 	public void Update(double horizontal, double vertical, double rotation) {
