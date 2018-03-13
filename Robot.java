@@ -180,11 +180,9 @@ public class Robot extends IterativeRobot {
 		
 		// Speed Control Section
 		
-		drive.EnableAutoSpeedControl(controllerSpeed.IsToggled(ButtonName.Select));
-		
-		drive.ManualSetMaxSpeed(controllerSpeed);
-		
-		drive.AutoSetMaxSpeed(elevator.getEncoderValue());
+		if(controllerSpeed.IsToggled(ButtonName.Select))
+			drive.AutoSetMaxSpeed(elevator.getEncoderValue());
+		else drive.ManualSetMaxSpeed(controllerSpeed);
 		
 		// Drive Section
 		
