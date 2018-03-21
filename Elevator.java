@@ -17,7 +17,7 @@ public class Elevator {
 	
 	private static final int ENCODER_VALUE_NONE = -1;
 	private static final int ENCODER_VALUE_SCALE = 2400;
-	private static final int ENCODER_VALUE_SWITCH = 600;
+	private static final int ENCODER_VALUE_SWITCH = 1000;
 	private static final int ENCODER_VALUE_BOTTOM = 0;
 	private static final double P = 0.003;
 	private static final double I = 0.0;
