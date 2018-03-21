@@ -133,6 +133,10 @@ public class Robot extends IterativeRobot {
 		
 		// Tilt Section
 		
+		if(controllerTilt.GetDpadDirection() == Dpad.Direction.Left) {
+			tilt.toggleTiltOnOff();
+		}
+		
 		if(controllerTilt.WasClicked(ButtonName.Start)) {
 			tilt.StartTilting();
 		}

@@ -70,7 +70,6 @@ public class Drive {
 		} else {
 			speedMultiplier = Y1;
 		}
-		System.out.println(encoderValue + ", " + speedMultiplier);
 		drive.setMaxOutput(speedMultiplier);
 	}
 	
