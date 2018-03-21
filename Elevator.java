@@ -15,10 +15,10 @@ public class Elevator {
 	private boolean calibrating;
 	private boolean foundBottom;
 	
-	private static final int ENCODER_VALUE_NONE = -1;
-	private static final int ENCODER_VALUE_SCALE = 2400;
-	private static final int ENCODER_VALUE_SWITCH = 600;
-	private static final int ENCODER_VALUE_BOTTOM = 0;
+	public static final int ENCODER_VALUE_NONE = -1;
+	public static final int ENCODER_VALUE_SCALE = 2400;
+	public static final int ENCODER_VALUE_SWITCH = 600;
+	public static final int ENCODER_VALUE_BOTTOM = 0;
 	private static final double P = 0.003;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
@@ -95,5 +95,9 @@ public class Elevator {
 	
 	public boolean isCalibrating() {
 		return calibrating;
+	}
+	
+	public int getEncoderValue() {
+		return encoder.get();
 	}
 }

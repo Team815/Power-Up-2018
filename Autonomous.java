@@ -10,15 +10,15 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 public abstract class Autonomous {
 	
 	public enum SwitchState {
-		CROSS_LINE_RIGHT(1),
 		CROSS_LINE_CENTER(2),
-		CROSS_LINE_LEFT(4),
-		SCORE_SWITCH_RIGHT(9),
-		SCORE_SWITCH_CENTER(10),
-		SCORE_SWITCH_LEFT(12),
-		SCORE_SCALE_RIGHT(6),
-		SCORE_SCALE_CENTER(5),
-		SCORE_SCALE_LEFT(3);
+		SCORE_SWITCH_RIGHT(1),
+		SCORE_SWITCH_LEFT(4),
+		SCORE_SCALE_RIGHT(9),
+		SCORE_SCALE_LEFT(12),
+		HALF_SCORE_SWITCH_RIGHT(3),
+		HALF_SCORE_SWITCH_LEFT(6),
+		HALF_SCORE_SCALE_RIGHT(11),
+		HALF_SCORE_SCALE_LEFT(14);
 		
 		static Map<Integer, SwitchState> map = new HashMap<>();
 		int switchboard_value;
