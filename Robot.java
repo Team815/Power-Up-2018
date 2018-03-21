@@ -43,6 +43,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		switchboard.Update();
 		Autonomous.SwitchState switchState = Autonomous.SwitchState.get(switchboard.GetBinaryValue());
+		System.out.println(switchState);
 		
 		switch (switchState) {
 		case CROSS_LINE_CENTER:

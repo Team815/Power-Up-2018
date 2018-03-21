@@ -51,11 +51,11 @@ public class AutoScoreSwitch extends Autonomous {
 
 	@Override
 	public void Update() {
+		tilt.Update();
 		switch (action) {
 		case APPROACH_SWITCH:
-			boolean isStraight = IsStraight();
 			boolean atSwitch = AtSwitch();
-			if(isStraight && atSwitch) {
+			if(atSwitch) {
 				if(doScore()) {
 					claw.setRollerDirection(RollerDirection.FORWARD);
 					action = Action.DROP_POWERCUBE;
@@ -110,13 +110,13 @@ public class AutoScoreSwitch extends Autonomous {
 	
 	private boolean scoreOnNearSide(char target) {
 		switch(switchState) {
-		case HALF_SCORE_SCALE_LEFT:
-		case SCORE_SCALE_LEFT:
+		case HALF_SCORE_SWITCH_LEFT:
+		case SCORE_SWITCH_LEFT:
 			if(target == 'L')
 				return true;
 			else return false;
-		case HALF_SCORE_SCALE_RIGHT:
-		case SCORE_SCALE_RIGHT:
+		case HALF_SCORE_SWITCH_RIGHT:
+		case SCORE_SWITCH_RIGHT:
 			if(target == 'R')
 				return true;
 			else return false;
@@ -126,7 +126,7 @@ public class AutoScoreSwitch extends Autonomous {
 	}
 	
 	private boolean doScore() {
-		if((switchState == SwitchState.HALF_SCORE_SCALE_RIGHT || switchState == SwitchState.HALF_SCORE_SCALE_LEFT) 
+		if((switchState == SwitchState.HALF_SCORE_SWITCH_RIGHT || switchState == SwitchState.HALF_SCORE_SWITCH_LEFT) 
 			&& !scoreOnNearSide(target))
 			return false;
 		else return true;
