@@ -105,4 +105,8 @@ public class Drive {
 	public Gyro getGyro() {
 		return gyro;
 	}
+
+	public double getSpeedMultiplier() {
+		return speedMultiplier;
+	}
 }

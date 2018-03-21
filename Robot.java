@@ -21,12 +21,14 @@ public class Robot extends IterativeRobot {
 	Controller controllerTilt;
 	Controller controllerDrive;
 	Controller controllerSpeed;
+	Controller controllerLog;
 	Switchboard switchboard = new Switchboard(2);
 	Drive drive = new Drive(4, 7, 10, 3);
 	Autonomous auto;
 	Claw claw = new Claw();
 	Elevator elevator = new Elevator(5,6);
 	Tilt tilt = new Tilt();
+	Log log = new Log(tilt, drive, elevator);
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -94,6 +96,7 @@ public class Robot extends IterativeRobot {
 		controllerElevator = controller1;
 		controllerTilt = controller1;
 		controllerSpeed = controller1;
+		controllerLog = controller1;
 		
 		drive.ResetPlayerAngle();
 		elevator.EnablePID();
@@ -199,6 +202,12 @@ public class Robot extends IterativeRobot {
 		double rotation = controllerDrive.GetValue(AnalogName.RightJoyX);
 		
 		drive.Update(horizontal, vertical, rotation);
+		
+		//	Log Section
+		
+		if(controllerLog.IsPressed(ButtonName.A))
+			log.output();
+		
 	}
 	
 	/**

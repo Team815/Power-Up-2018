@@ -1,5 +1,8 @@
 package org.usfirst.frc.team815.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -64,7 +67,6 @@ public class Tilt {
 				break;
 			}
 		}
-		else System.out.println("Tilt Disabled");
 	}
 	
 	public void Update() {
@@ -106,8 +108,23 @@ public class Tilt {
 	
 	public void toggleTiltOnOff() {
 		tiltOn = !tiltOn;
-		if(tiltOn)
-			System.out.println("Tilt Enabled");
-		else System.out.println("Tilt Disabled");
+	}
+
+	public boolean getTiltOnOff() {
+		return tiltOn;
+	}
+	
+	public Map<String, Integer> getEncoderValues() {
+		Map<String, Integer> encoderValues = new HashMap<>();
+		encoderValues.put("left", leftEncoder.get());
+		encoderValues.put("right", rightEncoder.get());
+		return encoderValues;
+	}
+	
+	public Map<String, Boolean> getLimitSwitchValues() {
+		Map<String, Boolean> limitSwitchValues = new HashMap<>();
+		limitSwitchValues.put("left", leftLimitSwitch.get());
+		limitSwitchValues.put("right", rightLimitSwitch.get());
+		return limitSwitchValues;
 	}
 }
