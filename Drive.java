@@ -18,9 +18,9 @@ public class Drive {
 	private Timer timer;
 	private double rotationCompensation;
 	private double speedMultiplier = 1;
-	private static final double MIN_MULTIPLIER = 0.2;
-	private static final double MAX_MULTIPLIER = 1;
 	private static final double MULTIPLIER_INCREMENT = 0.1;
+	private static final double MIN_MULTIPLIER = 0.2;
+	private static final double MAX_MULTIPLIER = 1.0;
 	private static final double P = 0.03;
 	private static final double I = 0.0;
 	private static final double D = 0.0;
@@ -48,15 +48,31 @@ public class Drive {
     	driveController.enable();
 	}
 	
-	public void SetMaxSpeed(Controller controller) {
+	public void ManualSetMaxSpeed(Controller controller) {
     	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
     		speedMultiplier -= MULTIPLIER_INCREMENT;
-    	} else if (controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
+    	} else if(controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
     		speedMultiplier += MULTIPLIER_INCREMENT;
     	}
     	
 		drive.setMaxOutput(speedMultiplier);
     }
+	
+	public void AutoSetMaxSpeed(int encoderValue) {
+		final double X0 = 0;
+		final double X1 = 2400;
+		final double Y1 = MIN_MULTIPLIER;
+		final double Y0 = MAX_MULTIPLIER;
+		if(encoderValue < X0) {
+			speedMultiplier = Y0;
+		} else if(encoderValue < X1) {
+			speedMultiplier = Y0 + ((encoderValue - X0) * ((Y1 - Y0) / (X1 - X0)));
+		} else {
+			speedMultiplier = Y1;
+		}
+		System.out.println(encoderValue + ", " + speedMultiplier);
+		drive.setMaxOutput(speedMultiplier);
+	}
 	
 	public void ResetPlayerAngle() {
 		gyro.reset();
