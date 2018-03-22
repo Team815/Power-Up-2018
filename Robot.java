@@ -144,6 +144,9 @@ public class Robot extends IterativeRobot {
 			tilt.StartTilting();
 		}
 		
+		if(tilt.state == Tilt.State.DOWN)
+			tilt.resetEncoders();
+		
 		tilt.Update();
 		
 		// Elevator Section

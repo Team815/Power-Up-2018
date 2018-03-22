@@ -12,6 +12,7 @@ public class Log {
 	private final boolean elevatorEncoderInfo = false;
 	private final boolean tiltEncoderInfo = false;
 	private final boolean tiltLimitSwitchInfo = false;
+	private final boolean tiltStateInfo = false;
 
 	public Log(Tilt tilt, Drive drive, Elevator elevator) {
 		this.tilt = tilt;
@@ -42,6 +43,10 @@ public class Log {
 		
 		if(tiltLimitSwitchInfo) {
 			System.out.println("Current tilt limit switch values: Left=" + tilt.getLimitSwitchValues().get("left") + " Right=" + tilt.getLimitSwitchValues().get("right"));
+		}
+		
+		if(tiltStateInfo) {
+			System.out.println("Tilt State: " + tilt.state);
 		}
 		
 		System.out.println("**************************************************");

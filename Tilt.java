@@ -96,9 +96,8 @@ public class Tilt {
 			break;
 		case DOWN:
 		case MOVING_DOWN:
-			leftEncoder.reset();
-			rightEncoder.reset();
 			state = State.DOWN;
+			break;
 		}
 	}
 	
@@ -126,5 +125,10 @@ public class Tilt {
 		limitSwitchValues.put("left", leftLimitSwitch.get());
 		limitSwitchValues.put("right", rightLimitSwitch.get());
 		return limitSwitchValues;
+	}
+	
+	public void resetEncoders() {
+		leftEncoder.reset();
+		rightEncoder.reset();
 	}
 }
