@@ -44,19 +44,22 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		switchboard.Update();
 		Autonomous.SwitchState switchState = Autonomous.SwitchState.get(switchboard.GetBinaryValue());
+		System.out.println(switchState);
 		
 		switch (switchState) {
-		case CROSS_LINE_RIGHT:
 		case CROSS_LINE_CENTER:
-		case CROSS_LINE_LEFT:
 			auto = new AutoCrossLine(drive.getGyro(), switchState);
 			break;
 		case SCORE_SWITCH_RIGHT:
-		case SCORE_SWITCH_CENTER:
 		case SCORE_SWITCH_LEFT:
+		case HALF_SCORE_SWITCH_RIGHT:
+		case HALF_SCORE_SWITCH_LEFT:
 			auto = new AutoScoreSwitch(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
-		case SCORE_SCALE_CENTER:
+		case SCORE_SCALE_RIGHT:
+		case SCORE_SCALE_LEFT:
+		case HALF_SCORE_SCALE_RIGHT:
+		case HALF_SCORE_SCALE_LEFT:
 			auto = new AutoScoreScale(drive.getGyro(), claw, tilt, elevator, switchState);
 			break;
 		default:

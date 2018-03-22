@@ -14,7 +14,6 @@ public class Elevator {
 	private DigitalInput limitSwitch;
 	private boolean calibrating;
 	private boolean foundBottom;
-	
 	private static final int ENCODER_VALUE_NONE = -1;
 	private static final int ENCODER_VALUE_SCALE = 2400;
 	private static final int ENCODER_VALUE_SWITCH = 1000;
