@@ -206,7 +206,7 @@ public class Robot extends IterativeRobot {
 		//	Log Section
 		
 		if(controllerLog.IsPressed(ButtonName.A))
-			log.output();
+			log.print();
 		
 	}
 	

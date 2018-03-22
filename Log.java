@@ -19,7 +19,9 @@ public class Log {
 		this.elevator = elevator;
 	}
 	
-	public void output() {
+	public void print() {
+		System.out.println("**************************************************");
+		
 		if(tiltModeInfo) {
 			if(tilt.getTiltOnOff())
 				System.out.println("Tilt Enabled");
@@ -42,6 +44,7 @@ public class Log {
 			System.out.println("Current tilt limit switch values: Left=" + tilt.getLimitSwitchValues().get("left") + " Right=" + tilt.getLimitSwitchValues().get("right"));
 		}
 		
+		System.out.println("**************************************************");
 	}
 	
 }
