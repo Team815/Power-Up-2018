@@ -70,7 +70,6 @@ public class Drive {
 		} else {
 			speedMultiplier = Y1;
 		}
-		System.out.println(encoderValue + ", " + speedMultiplier);
 		drive.setMaxOutput(speedMultiplier);
 	}
 	
@@ -105,5 +104,9 @@ public class Drive {
 	
 	public Gyro getGyro() {
 		return gyro;
+	}
+
+	public double getSpeedMultiplier() {
+		return speedMultiplier;
 	}
 }

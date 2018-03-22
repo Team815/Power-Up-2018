@@ -1,5 +1,8 @@
 package org.usfirst.frc.team815.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -22,6 +25,7 @@ public class Tilt {
 	private Encoder rightEncoder;
 	public State state;
 	private boolean hitLimitSwitch;
+	private boolean tiltOn;
 	
 	public enum State {
 		UP,
@@ -43,22 +47,25 @@ public class Tilt {
 		leftTiltMotor.setInverted(true);
 		state = State.DOWN;
 		hitLimitSwitch = leftLimitSwitch.get() || rightLimitSwitch.get();
+		tiltOn = hitLimitSwitch;
 	}
 	
 	public void StartTilting() {
-		switch(state) {
-		case DOWN:
-		case MOVING_DOWN:
-			if(hitLimitSwitch) {
-				motors.SetSpeed(-1);
-				state = State.MOVING_UP;
+		if(tiltOn) {
+			switch(state) {
+			case DOWN:
+			case MOVING_DOWN:
+				if(hitLimitSwitch) {
+					motors.SetSpeed(-1);
+					state = State.MOVING_UP;
+					break;
+				} // else do what UP and MOVING_UP do (i.e. move down)
+			case UP:
+			case MOVING_UP:
+				motors.SetSpeed(1);
+				state = State.MOVING_DOWN;
 				break;
-			} // else do what UP and MOVING_UP do (i.e. move down)
-		case UP:
-		case MOVING_UP:
-			motors.SetSpeed(1);
-			state = State.MOVING_DOWN;
-			break;
+			}
 		}
 	}
 	
@@ -89,13 +96,39 @@ public class Tilt {
 			break;
 		case DOWN:
 		case MOVING_DOWN:
-			leftEncoder.reset();
-			rightEncoder.reset();
 			state = State.DOWN;
+			break;
 		}
 	}
 	
 	public void Set(double valueIn) {
 		motors.SetSpeed(valueIn);
+	}
+	
+	public void toggleTiltOnOff() {
+		tiltOn = !tiltOn;
+	}
+
+	public boolean getTiltOnOff() {
+		return tiltOn;
+	}
+	
+	public Map<String, Integer> getEncoderValues() {
+		Map<String, Integer> encoderValues = new HashMap<>();
+		encoderValues.put("left", leftEncoder.get());
+		encoderValues.put("right", rightEncoder.get());
+		return encoderValues;
+	}
+	
+	public Map<String, Boolean> getLimitSwitchValues() {
+		Map<String, Boolean> limitSwitchValues = new HashMap<>();
+		limitSwitchValues.put("left", leftLimitSwitch.get());
+		limitSwitchValues.put("right", rightLimitSwitch.get());
+		return limitSwitchValues;
+	}
+	
+	public void resetEncoders() {
+		leftEncoder.reset();
+		rightEncoder.reset();
 	}
 }
