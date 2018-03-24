@@ -8,7 +8,7 @@ public class Log {
 	
 	// Disable/Enable Logging
 	private final boolean tiltModeInfo = false;
-	private final boolean speedControlInfo = false;
+	private final boolean speedControlInfo = true;
 	private final boolean elevatorEncoderInfo = false;
 	private final boolean tiltEncoderInfo = false;
 	private final boolean tiltLimitSwitchInfo = false;
@@ -31,6 +31,9 @@ public class Log {
 		
 		if(speedControlInfo) {
 			System.out.println("Current Max Speed: " + drive.getSpeedMultiplier()*100 + "%");
+			if(Drive.autoSpeedControlEnabled)
+				System.out.println("Speed Control Mode: Auto");
+			else System.out.println("Speed Control Mode: Manual");
 		}
 		
 		if(elevatorEncoderInfo) {

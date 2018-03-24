@@ -25,6 +25,7 @@ public class Drive {
 	private static final double I = 0.0;
 	private static final double D = 0.0;
 	private static final double PID_DELAY = 0.5;
+	public static boolean autoSpeedControlEnabled;
 	
 	private class DriveOutput implements PIDOutput {
 
@@ -49,6 +50,8 @@ public class Drive {
 	}
 	
 	public void ManualSetMaxSpeed(Controller controller) {
+		autoSpeedControlEnabled = false;
+		
     	if(controller.WasClicked(ButtonName.LB) && speedMultiplier > MIN_MULTIPLIER) {
     		speedMultiplier -= MULTIPLIER_INCREMENT;
     	} else if(controller.WasClicked(ButtonName.RB) && speedMultiplier < MAX_MULTIPLIER) {
@@ -59,6 +62,8 @@ public class Drive {
     }
 	
 	public void AutoSetMaxSpeed(int encoderValue) {
+		autoSpeedControlEnabled = true;
+		
 		final double X0 = 0;
 		final double X1 = 2400;
 		final double Y1 = MIN_MULTIPLIER;

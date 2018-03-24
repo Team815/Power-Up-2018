@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 
 public class Tilt {
-	private static final int NO_TILT_ROTATION_VALUE = -5200;
+	private static final int NO_TILT_ROTATION_VALUE = -5700;
 	private static final int LEFT_TILT_MOTOR_PORT = 8;
 	private static final int RIGHT_TILT_MOTOR_PORT = 9;
 	private static final int LEFT_LIMIT_SWITCH_PORT = 8;

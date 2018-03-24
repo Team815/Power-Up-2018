@@ -50,7 +50,7 @@ public class Robot extends IterativeRobot {
 		
 		switch (switchState) {
 		case CROSS_LINE_CENTER:
-			auto = new AutoCrossLine(drive.getGyro(), switchState);
+			auto = new AutoCrossLine(drive.getGyro(), switchState, tilt);
 			break;
 		case SCORE_SWITCH_RIGHT:
 		case SCORE_SWITCH_LEFT:
@@ -194,8 +194,8 @@ public class Robot extends IterativeRobot {
 		// Speed Control Section
 		
 		if(controllerSpeed.IsToggled(ButtonName.Select))
-			drive.AutoSetMaxSpeed(elevator.getEncoderValue());
-		else drive.ManualSetMaxSpeed(controllerSpeed);
+			drive.ManualSetMaxSpeed(controllerSpeed);
+		else drive.AutoSetMaxSpeed(elevator.getEncoderValue());
 		
 		// Drive Section
 		

@@ -92,6 +92,17 @@ public class Elevator {
 		}
 	}
 	
+	public boolean calibrationFinished() {
+		if(limitSwitch.get()) {
+//			calibrating = false;
+//			foundBottom = true;
+//			encoder.reset();
+//			EnablePID();
+			return true;
+		}
+		else return false;
+	}
+	
 	public boolean isCalibrating() {
 		return calibrating;
 	}

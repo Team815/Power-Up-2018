@@ -5,10 +5,11 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoCrossLine extends Autonomous {
 	
-	private static final Movement STRAIGHT = new Movement(0.5, 00.0, 00.0, 2.0);
+	private static final Movement STRAIGHT = new Movement(0.5, 00.0, 00.0, 2.0	);
 	
-	public AutoCrossLine(Gyro gyroIn, SwitchState switchStateIn) {
+	public AutoCrossLine(Gyro gyroIn, SwitchState switchStateIn, Tilt tilt) {
 		super(gyroIn, switchStateIn);
+		this.tilt = tilt;
 		timer = new Timer();
 	}
 
@@ -19,11 +20,13 @@ public class AutoCrossLine extends Autonomous {
 		angleEnd = STRAIGHT.ANGLE_END;
 		timeout = STRAIGHT.TIMEOUT;
 		rotation = 0;
+		tilt.StartTilting();
 		timer.start();
 	}
 
 	@Override
 	public void Update() {
+		tilt.Update();
 		if(timer.get() >= timeout) {
 			horizontal = 0;
 			vertical = 0;

@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreScale extends Autonomous {
-	private static final Movement HALF 	= new Movement(0.5, 00.0, 00.0, 2.5);
-	private static final Movement CLOSE = new Movement(0.5, 00.0, 00.0, 2.5);
+	private static final Movement HALF 	= new Movement(0.5, 00.0, 00.0, 2.0);
+	private static final Movement CLOSE = new Movement(0.5, 00.0, 00.0, 1.9);
 	private static final Movement FAR   = new Movement(0.25, 90.0, 00.0, 5.0);
 	private static final double H_FACTOR = 2.8;
 	private final char target = GameLayout.charAt(1);
+	private boolean isCalibrated = false;
 	
 	public AutoScoreScale(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
 		super(gyroIn, switchStateIn);
@@ -52,28 +53,44 @@ public class AutoScoreScale extends Autonomous {
 	public void Update() {
 		switch (action) {
 		case APPROACH_SCALE:
+			System.out.println("Approach Scale");
 			boolean isStraight = IsStraight();
 			boolean atScale = AtSwitch();
 			if(isStraight && atScale) {
 				if(doScore()) {
-				elevator.SetPresetTarget(PresetTarget.SCALE);
-				action = Action.RAISE_ELEVATOR;
-				timer.reset();
+					action = Action.RAISE_ELEVATOR;
+					timer.stop();
+					timer.reset();
 				}
 				else action = Action.STOP;
 			}
 			break;
 		case RAISE_ELEVATOR:
-			if(elevator.getEncoderValue() >= Elevator.ENCODER_VALUE_SCALE) {
+			if(!isCalibrated) {
+				elevator.Calibrate();
+				isCalibrated = true;
+			}
+			
+			elevator.CheckCalibration();
+			
+			if(elevator.calibrationFinished()) {
+				elevator.SetPresetTarget(PresetTarget.SCALE);
+			}
+			
+			if(elevator.getEncoderValue() >= Elevator.ENCODER_VALUE_SCALE-100) {
 				action = Action.DROP_POWERCUBE;
+				timer.start();
+				claw.setRollerDirection(RollerDirection.FORWARD_AUTO);
 			}
 			break;
 		case DROP_POWERCUBE:
+			System.out.println("Drop Powercube");
 			if(timer.get() >= 1) {
 				action = Action.STOP;
 			}
 			break;
 		case STOP:
+			System.out.println("Stop");
 			claw.setRollerDirection(RollerDirection.STOPPED);
 			timer.stop();
 			timer.reset();

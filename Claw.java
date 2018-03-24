@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Claw {
-	private final static double CLAW_MOVEMENT_TIME = 0.5;
+	private final static double CLAW_MOVEMENT_TIME = 0.25;
 	
 	private WPI_VictorSPX clawMotor;
 	private PIDOutputMulti<WPI_VictorSPX> rollerMotors;
@@ -14,6 +14,7 @@ public class Claw {
 	private Timer timer;
 	
 	public enum RollerDirection {
+		FORWARD_AUTO(.6),
 		FORWARD(.5),
 		BACKWARD(-1),
 		STOPPED(0);

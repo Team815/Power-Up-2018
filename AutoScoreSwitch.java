@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class AutoScoreSwitch extends Autonomous {
 	
-	private static final Movement HALF 	= new Movement(0.28, 00.0, 00.0, 3.0);
-	private static final Movement CLOSE = new Movement(0.28, 00.0, 00.0, 3.0);
-	private static final Movement FAR   = new Movement(0.25, 90.0, 00.0, 5.0);
-	private static final double H_FACTOR = 2.8;
+	private static final Movement HALF 	= new Movement(0.28, 00.0, 00.0, 4.0);
+	private static final Movement CLOSE = new Movement(0.28, 00.0, 00.0, 4.0);
+	private static final Movement FAR   = new Movement(0.26, 90.0, 00.0, 5.5);
+	private static final double H_FACTOR = 2.0;
 	private final char target = GameLayout.charAt(0);
 	
 	public AutoScoreSwitch(Gyro gyroIn, Claw claw, Tilt tilt, Elevator elevator, SwitchState switchStateIn) {
@@ -57,7 +57,7 @@ public class AutoScoreSwitch extends Autonomous {
 			boolean atSwitch = AtSwitch();
 			if(atSwitch) {
 				if(doScore()) {
-					claw.setRollerDirection(RollerDirection.FORWARD);
+					claw.setRollerDirection(RollerDirection.FORWARD_AUTO);
 					action = Action.DROP_POWERCUBE;
 					timer.reset();
 				}
